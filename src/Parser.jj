@@ -16,24 +16,103 @@ SKIP :
 
 TOKEN :
 {
-  < INTEGER : (["0" - "9"])+ > |
-  < OPERATOR : ("+" | "-") > |
-  < LF : "\n" >
+  < IDENTIFIER : ("\w") > |
+  < INTEGER_LITERAL : (["0"-"9"])+ > |
+  < EOF : "\n" >
 }
 
-void Aritm() : {Token t1, t2, t3;}
+void Program() : {}
 {
-  t1=<INTEGER> {
-    System.out.println("Integer = " + t1.image);
-  }
-  ( 
-    t2=<OPERATOR> {
-      System.out.println("Operator = " + t2.image);
-    }
-    t3=<INTEGER> {
-      System.out.println("Integer = " + t3.image);
-    }
-  )* 
-  <LF>
+  ClassDeclaration() <EOF>
 }
 
+void ClassDeclaration() : {} 
+{
+  "class" <IDENTIFIER> ("extends" <IDENTIFIER>)? "{" 
+  (VarDeclaration())*
+  (MainDeclaration() | MethodDeclaration())*
+  "}"
+}
+
+void VarDeclaration() : {}
+{
+  <TYPE> <IDENTIFIER> ";"
+}
+
+void MainDeclaration() : {}
+{
+  "public" "static" "void" "main" "(" "String" "[" "]" <IDENTIFIER> ")" "{"
+  (VarDeclaration())*
+  (Statement())*
+  "}"
+}
+
+void MethodDeclaration() : {}
+{
+  "public" <TYPE> <IDENTIFIER> 
+  "(" (<TYPE> <IDENTIFIER> "," (<TYPE> <IDENTIFIER>)*)? ")"
+  "{"
+  (VarDeclaration())*
+  (Statement())*
+  "return" Expression() ";"
+  "}"
+}
+
+void Type() : {}
+{
+  "int"
+}
+
+void Statement() : {}
+{
+  (
+   "{" (Statement())* "}"
+  ) |
+  (
+    "if" "(" Expression() ")" Statement() "else" Statement()
+  ) |
+  (
+    "while" "(" Expression() ")" Statement()
+  ) |
+  (
+    Expression() ";"
+  ) |
+  (
+    <IDENTIFIER> "=" Expression() ";"
+  ) |
+  (
+    <IDENTIFIER> "[" Expression() "]" "=" Expression() ";"
+  )
+}
+
+void Expression() : {}
+{
+  (
+    Expression() ("&&" | "<" | "+" | "-" | "*" | "/") Expression()
+  ) |
+  (
+    Expression() "[" Expression() "]"
+  ) |
+  (
+    Expression() "." "length"
+  ) |
+  (
+   Expression() "." <IDENTIFIER> "(" (Expression() ("," Expression())*)? ")"
+  ) |
+  <INTEGER_LITERAL> |
+  <IDENTIFIER> |
+  "true" | "false" |
+  "this" |
+  (
+    "new" "int" "[" Expression() "]"
+  ) |
+  (
+    "new" <IDENTIFER> "(" ")"
+  ) |
+  (
+   "!" Expression()
+  ) |
+  (
+   "(" Expression() ")"
+  )
+}
