@@ -1,32 +1,38 @@
-PARSER_BEGIN(Parser)
+/* Parser.jj : A Java-- parser. */
 
-import java.io.*;
-import java.io.InputStream;
+options {
 
-public class Parser {
-	public static void main(String args[]) throws ParseException, IOException {
-		Parser parser;
-
-		switch(args.length) {
-			case 0:
-				parser = new Parser(System.in);
-				break;
-			case 1:
-				parser = new Parser(readInputFile(args[0]));
-				break;
-			default:
-				return;
-		}
-
-    	parser.Aritm();
-	}
-	public static InputStream readInputFile(String inputFile) 
-		throws IOException {
-		File initialFile = new File(inputFile);
-		InputStream targetStream = new FileInputStream(initialFile);
-		return targetStream;
-	}
 }
+
+PARSER_BEGIN(Parser)
+  import java.io.*;
+  import java.io.InputStream;
+
+  public class Parser {
+    public static void main(String args[]) throws ParseException, IOException {
+      Parser parser;
+
+      switch(args.length) {
+        case 0:
+          parser = new Parser(System.in);
+          break;
+        case 1:
+          parser = new Parser(readInputFile(args[0]));
+          break;
+        default:
+          return;
+      }
+
+      parser.Aritm();
+    }
+
+    public static InputStream readInputFile(String inputFile) 
+      throws IOException {
+        File initialFile = new File(inputFile);
+        InputStream targetStream = new FileInputStream(initialFile);
+        return targetStream;
+      }
+  }
 
 PARSER_END(Parser)
 
@@ -37,9 +43,15 @@ SKIP :
 
 TOKEN :
 {
-  < IDENTIFIER : ("\w") > |
-  < INTEGER_LITERAL : (["0"-"9"])+ > |
-  < EOF : "\n" >
+  < TYPE: "int" "[" "]" | "boolean" | "int" | <IDENTIFIER> >
+  | 
+  < IDENTIFIER : (["A"-"z"]) > 
+  |
+  < INTEGER_LITERAL : <DIGITS> >
+  |
+  < #DIGITS : (["0"-"9"])+ >
+  |
+  < EOL : "\n" | "\r" | "\r\n" >
 }
 
 void Program() : {}
@@ -50,8 +62,8 @@ void Program() : {}
 void ClassDeclaration() : {} 
 {
   "class" <IDENTIFIER> ("extends" <IDENTIFIER>)? "{" 
-  (VarDeclaration())*
-  (MainDeclaration() | MethodDeclaration())*
+    (VarDeclaration())*
+    (MainDeclaration() | MethodDeclaration())*
   "}"
 }
 
@@ -62,9 +74,10 @@ void VarDeclaration() : {}
 
 void MainDeclaration() : {}
 {
-  "public" "static" "void" "main" "(" "String" "[" "]" <IDENTIFIER> ")" "{"
-  (VarDeclaration())*
-  (Statement())*
+  "public" "static" "void" "main" 
+  "(" "String" "[" "]" <IDENTIFIER> ")" "{"
+    (VarDeclaration())*
+    (Statement())*
   "}"
 }
 
@@ -73,66 +86,79 @@ void MethodDeclaration() : {}
   "public" <TYPE> <IDENTIFIER> 
   "(" (<TYPE> <IDENTIFIER> "," (<TYPE> <IDENTIFIER>)*)? ")"
   "{"
-  (VarDeclaration())*
-  (Statement())*
-  "return" Expression() ";"
+    (VarDeclaration())*
+    (Statement())*
+    "return" Expression() ";"
   "}"
-}
-
-void Type() : {}
-{
-  "int"
 }
 
 void Statement() : {}
 {
   (
    "{" (Statement())* "}"
-  ) |
+  ) 
+  |
   (
-    "if" "(" Expression() ")" Statement() "else" Statement()
-  ) |
+   "if" "(" Expression() ")" Statement() "else" Statement()
+  ) 
+  |
   (
-    "while" "(" Expression() ")" Statement()
-  ) |
+   "while" "(" Expression() ")" Statement()
+  ) 
+  |
   (
-    Expression() ";"
-  ) |
+   Expression() ";"
+  ) 
+  |
   (
-    <IDENTIFIER> "=" Expression() ";"
-  ) |
+   <IDENTIFIER> "=" Expression() ";"
+  ) 
+  |
   (
-    <IDENTIFIER> "[" Expression() "]" "=" Expression() ";"
+   <IDENTIFIER> "[" Expression() "]" "=" Expression() ";"
   )
 }
 
 void Expression() : {}
 {
   (
-    Expression() ("&&" | "<" | "+" | "-" | "*" | "/") Expression()
-  ) |
+   Expression() ("&&" | "<" | "+" | "-" | "*" | "/") Expression()
+  ) 
+  |
   (
-    Expression() "[" Expression() "]"
-  ) |
+   Expression() "[" Expression() "]"
+  ) 
+  |
   (
-    Expression() "." "length"
-  ) |
+   Expression() "." "length"
+  ) 
+  |
   (
    Expression() "." <IDENTIFIER> "(" (Expression() ("," Expression())*)? ")"
-  ) |
-  <INTEGER_LITERAL> |
-  <IDENTIFIER> |
-  "true" | "false" |
-  "this" |
+  ) 
+  |
+  <INTEGER_LITERAL> 
+  |
+  <IDENTIFIER> 
+  |
+  "true" 
+  | 
+  "false" 
+  |
+  "this" 
+  |
   (
-    "new" "int" "[" Expression() "]"
-  ) |
+   "new" "int" "[" Expression() "]"
+  ) 
+  |
   (
-    "new" <IDENTIFER> "(" ")"
-  ) |
+   "new" <IDENTIFIER> "(" ")"
+  ) 
+  |
   (
    "!" Expression()
-  ) |
+  ) 
+  |
   (
    "(" Expression() ")"
   )
