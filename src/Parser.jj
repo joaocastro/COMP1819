@@ -1,29 +1,20 @@
 /* Parser.jj : A Java-- parser. */
 
 options {
-
+  LOOKAHEAD=1;
 }
 
 PARSER_BEGIN(Parser)
-  import java.io.*;
   import java.io.InputStream;
 
   public class Parser {
     public static void main(String args[]) throws ParseException, IOException {
       Parser parser;
 
-      switch(args.length) {
-        case 0:
-          parser = new Parser(System.in);
-          break;
-        case 1:
-          parser = new Parser(readInputFile(args[0]));
-          break;
-        default:
-          return;
-      }
+      InputStream parserStream = args.length == 0 ? System.in : readInputFile(args[0]);
+      parser = new Parser(parserStream);
 
-      parser.Aritm();
+      parser.Program();
     }
 
     public static InputStream readInputFile(String inputFile) 
@@ -33,7 +24,6 @@ PARSER_BEGIN(Parser)
         return targetStream;
       }
   }
-
 PARSER_END(Parser)
 
 SKIP :
@@ -69,7 +59,12 @@ void ClassDeclaration() : {}
 {
   "class" <IDENTIFIER> ("extends" <IDENTIFIER>)? "{" 
     (VarDeclaration())*
-    (MainDeclaration() | MethodDeclaration())*
+    (
+    LOOKAHEAD(2) 
+    MainDeclaration() 
+    | 
+    MethodDeclaration()
+    )*
   "}"
 }
 
@@ -100,13 +95,13 @@ void MethodDeclaration() : {}
 
 void Statement() : {}
 {
-   "{" (Statement())* "}"
+  "{" (Statement())* "}"
   |
-   "if" "(" Expression() ")" Statement() "else" Statement()
+  "if" "(" Expression() ")" Statement() "else" Statement()
   |
-   "while" "(" Expression() ")" Statement()
+  "while" "(" Expression() ")" Statement()
   |
-   Expression() ";"
+  Expression() ";"
   |
   <IDENTIFIER> (
     "=" Expression() ";"
@@ -132,7 +127,9 @@ void Expression() : {}
 
 void SimpleExpression() : {}
 {
-  <TRUE> | <FALSE>
+  <TRUE> 
+  | 
+  <FALSE>
   |
   <THIS>
   |
@@ -146,7 +143,7 @@ void SimpleExpression() : {}
     <IDENTIFIER> "(" ")"
   )
   |
-   "!" Expression()
+  "!" Expression()
   |
-   "(" Expression() ")"
+  "(" Expression() ")"
 }
