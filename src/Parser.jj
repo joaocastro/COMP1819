@@ -44,6 +44,12 @@ SKIP :
 TOKEN :
 {
   < TYPE: "int" "[" "]" | "boolean" | "int" | <IDENTIFIER> >
+  |
+  < TRUE: "true" >
+  |
+  < FALSE: "false" >
+  | 
+  < THIS: "this" >
   | 
   < IDENTIFIER : (["A"-"z"]) > 
   |
@@ -94,72 +100,53 @@ void MethodDeclaration() : {}
 
 void Statement() : {}
 {
-  (
    "{" (Statement())* "}"
-  ) 
   |
-  (
    "if" "(" Expression() ")" Statement() "else" Statement()
-  ) 
   |
-  (
    "while" "(" Expression() ")" Statement()
-  ) 
   |
-  (
    Expression() ";"
-  ) 
   |
-  (
-   <IDENTIFIER> "=" Expression() ";"
-  ) 
-  |
-  (
-   <IDENTIFIER> "[" Expression() "]" "=" Expression() ";"
+  <IDENTIFIER> (
+    "=" Expression() ";"
+    |
+    "[" Expression() "]" "=" Expression() ";"
   )
 }
 
 void Expression() : {}
 {
-  (
-   Expression() ("&&" | "<" | "+" | "-" | "*" | "/") Expression()
-  ) 
+  SimpleExpression() (
+    ("&&" | "<" | "+" | "-" | "*" | "/") SimpleExpression()
+    |
+    "[" SimpleExpression() "]"
+    |
+    "." (
+      "length"
+      |
+      <IDENTIFIER> "(" (SimpleExpression() ("," SimpleExpression())*)? ")"
+    )
+  )*
+}
+
+void SimpleExpression() : {}
+{
+  <TRUE> | <FALSE>
   |
-  (
-   Expression() "[" Expression() "]"
-  ) 
-  |
-  (
-   Expression() "." "length"
-  ) 
-  |
-  (
-   Expression() "." <IDENTIFIER> "(" (Expression() ("," Expression())*)? ")"
-  ) 
+  <THIS>
   |
   <INTEGER_LITERAL> 
   |
   <IDENTIFIER> 
   |
-  "true" 
-  | 
-  "false" 
-  |
-  "this" 
-  |
-  (
-   "new" "int" "[" Expression() "]"
-  ) 
-  |
-  (
-   "new" <IDENTIFIER> "(" ")"
-  ) 
-  |
-  (
-   "!" Expression()
-  ) 
-  |
-  (
-   "(" Expression() ")"
+  "new" (
+    "int" "[" Expression() "]"
+    |
+    <IDENTIFIER> "(" ")"
   )
+  |
+   "!" Expression()
+  |
+   "(" Expression() ")"
 }
