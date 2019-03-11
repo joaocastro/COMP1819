@@ -11,7 +11,7 @@ PARSER_BEGIN(Parser)
     public static void main(String args[]) throws ParseException, IOException {
       Parser parser;
 
-      InputStream parserStream = args.length == 0 ? System.in : readInputFile(args[0]);
+      InputStream parserStream = (args.length == 0) ? System.in : readInputFile(args[0]);
       parser = new Parser(parserStream);
 
       parser.Program();
@@ -33,21 +33,47 @@ SKIP :
 
 TOKEN :
 {
-  < TYPE: "int" "[" "]" | "boolean" | "int" | <IDENTIFIER> >
+  < CLASS : "class" >
   |
-  < TRUE: "true" >
+  < EXTENDS : "extends" >
   |
-  < FALSE: "false" >
+  < PUBLIC : "public" >
+  |
+  < STATIC : "static" >
+  |
+  < VOID : "void" >
+  |
+  < MAIN : "main" >
+  |
+  < STRING : "String" >
+  |
+  < RETURN : "return" >
+  |
+  < IF : "if" >
+  |
+  < ELSE : "else" >
+  |
+  < WHILE : "while" >
+  |
+  < LENGTH : "length" >
+  |
+  < NEW : "new" >
   | 
-  < THIS: "this" >
+  < TRUE : "true" >
   | 
-  < IDENTIFIER : (["A"-"z"]) > 
+  < FALSE : "false" >
+  | 
+  < THIS : "this" >
+  | 
+  < TYPE : "int" ("[" "]")? | "boolean" | <IDENTIFIER> >
+  |
+  < IDENTIFIER : (["a"-"z"] | ["A"-"Z"] | "_")(["a"-"z"] | ["A"-"Z"] | ["0"-"9"] | "_")* > 
   |
   < INTEGER_LITERAL : <DIGITS> >
   |
-  < #DIGITS : (["0"-"9"])+ >
+  < BOOLEAN_LITERAL : "true" | "false" >
   |
-  < EOL : "\n" | "\r" | "\r\n" >
+  < #DIGITS : (["0"-"9"])+ >
 }
 
 void Program() : {}
@@ -57,7 +83,7 @@ void Program() : {}
 
 void ClassDeclaration() : {} 
 {
-  "class" <IDENTIFIER> ("extends" <IDENTIFIER>)? "{" 
+  <CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? "{" 
     (VarDeclaration())*
     (
     LOOKAHEAD(2) 
@@ -75,8 +101,8 @@ void VarDeclaration() : {}
 
 void MainDeclaration() : {}
 {
-  "public" "static" "void" "main" 
-  "(" "String" "[" "]" <IDENTIFIER> ")" "{"
+  <PUBLIC> <STATIC> <VOID> <MAIN>
+  "(" <STRING> "[" "]" <IDENTIFIER> ")" "{"
     (VarDeclaration())*
     (Statement())*
   "}"
@@ -84,12 +110,12 @@ void MainDeclaration() : {}
 
 void MethodDeclaration() : {}
 {
-  "public" <TYPE> <IDENTIFIER> 
+  <PUBLIC> <TYPE> <IDENTIFIER> 
   "(" (<TYPE> <IDENTIFIER> "," (<TYPE> <IDENTIFIER>)*)? ")"
   "{"
     (VarDeclaration())*
     (Statement())*
-    "return" Expression() ";"
+    <RETURN> Expression() ";"
   "}"
 }
 
@@ -97,9 +123,9 @@ void Statement() : {}
 {
   "{" (Statement())* "}"
   |
-  "if" "(" Expression() ")" Statement() "else" Statement()
+  <IF> "(" Expression() ")" Statement() <ELSE> Statement()
   |
-  "while" "(" Expression() ")" Statement()
+  <WHILE> "(" Expression() ")" Statement()
   |
   Expression() ";"
   |
@@ -118,7 +144,7 @@ void Expression() : {}
     "[" SimpleExpression() "]"
     |
     "." (
-      "length"
+      <LENGTH>
       |
       <IDENTIFIER> "(" (SimpleExpression() ("," SimpleExpression())*)? ")"
     )
@@ -137,7 +163,7 @@ void SimpleExpression() : {}
   |
   <IDENTIFIER> 
   |
-  "new" (
+  <NEW> (
     "int" "[" Expression() "]"
     |
     <IDENTIFIER> "(" ")"
