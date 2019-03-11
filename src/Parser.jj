@@ -5,6 +5,7 @@ options {
 }
 
 PARSER_BEGIN(Parser)
+  import java.io.*;
   import java.io.InputStream;
 
   public class Parser {
@@ -65,7 +66,13 @@ TOKEN :
   | 
   < THIS : "this" >
   | 
-  < TYPE : "int" ("[" "]")? | "boolean" | <IDENTIFIER> >
+  < TYPE_INT : "int" >
+  |
+  < TYPE : <TYPE_INT> ("[" "]")? | "boolean" | <IDENTIFIER> >
+  |
+  < ARITHM_OPERATOR : "+" | "-" | "*" | "/" >
+  |
+  < COMPAR_OPERATOR : "&&" | "<" >
   |
   < IDENTIFIER : (["a"-"z"] | ["A"-"Z"] | "_")(["a"-"z"] | ["A"-"Z"] | ["0"-"9"] | "_")* > 
   |
@@ -86,10 +93,8 @@ void ClassDeclaration() : {}
   <CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? "{" 
     (VarDeclaration())*
     (
-    LOOKAHEAD(2) 
-    MainDeclaration() 
-    | 
-    MethodDeclaration()
+     LOOKAHEAD(2) 
+     MainDeclaration() | MethodDeclaration()
     )*
   "}"
 }
@@ -111,11 +116,11 @@ void MainDeclaration() : {}
 void MethodDeclaration() : {}
 {
   <PUBLIC> <TYPE> <IDENTIFIER> 
-  "(" (<TYPE> <IDENTIFIER> "," (<TYPE> <IDENTIFIER>)*)? ")"
+  "(" (<TYPE> <IDENTIFIER> ("," <TYPE> <IDENTIFIER>)*)? ")"
   "{"
     (VarDeclaration())*
     (Statement())*
-    <RETURN> Expression() ";"
+    <RETURN> Expr() ";"
   "}"
 }
 
@@ -123,53 +128,15 @@ void Statement() : {}
 {
   "{" (Statement())* "}"
   |
-  <IF> "(" Expression() ")" Statement() <ELSE> Statement()
+  <IF> "(" Expr() ")" Statement() <ELSE> Statement()
   |
-  <WHILE> "(" Expression() ")" Statement()
+  <WHILE> "(" Expr() ")" Statement()
   |
-  Expression() ";"
-  |
-  <IDENTIFIER> (
-    "=" Expression() ";"
-    |
-    "[" Expression() "]" "=" Expression() ";"
-  )
+  (<IDENTIFIER> ("[" Expr() "]")? "=")? Expr() ";"
 }
 
-void Expression() : {}
+void Expr() : {}
 {
-  SimpleExpression() (
-    ("&&" | "<" | "+" | "-" | "*" | "/") SimpleExpression()
-    |
-    "[" SimpleExpression() "]"
-    |
-    "." (
-      <LENGTH>
-      |
-      <IDENTIFIER> "(" (SimpleExpression() ("," SimpleExpression())*)? ")"
-    )
-  )*
+  <TRUE>
 }
 
-void SimpleExpression() : {}
-{
-  <TRUE> 
-  | 
-  <FALSE>
-  |
-  <THIS>
-  |
-  <INTEGER_LITERAL> 
-  |
-  <IDENTIFIER> 
-  |
-  <NEW> (
-    "int" "[" Expression() "]"
-    |
-    <IDENTIFIER> "(" ")"
-  )
-  |
-  "!" Expression()
-  |
-  "(" Expression() ")"
-}
