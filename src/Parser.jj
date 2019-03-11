@@ -1,10 +1,31 @@
 PARSER_BEGIN(Parser)
 
+import java.io.*;
+import java.io.InputStream;
+
 public class Parser {
-  public static void main(String args[]) throws ParseException {
-    Example parser = new Example(System.in);
-    parser.Aritm();
-  }
+	public static void main(String args[]) throws ParseException, IOException {
+		Parser parser;
+
+		switch(args.length) {
+			case 0:
+				parser = new Parser(System.in);
+				break;
+			case 1:
+				parser = new Parser(readInputFile(args[0]));
+				break;
+			default:
+				return;
+		}
+
+    	parser.Aritm();
+	}
+	public static InputStream readInputFile(String inputFile) 
+		throws IOException {
+		File initialFile = new File(inputFile);
+		InputStream targetStream = new FileInputStream(initialFile);
+		return targetStream;
+	}
 }
 
 PARSER_END(Parser)
