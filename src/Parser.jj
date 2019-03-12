@@ -1,4 +1,8 @@
-/* Parser.jj : A Java-- parser. */
+/*
+ * Parser.jj
+ *
+ * A Java-- (MiniJava) parser.
+ */
 
 options {
   LOOKAHEAD=1;
@@ -27,61 +31,78 @@ PARSER_BEGIN(Parser)
   }
 PARSER_END(Parser)
 
+/* 
+ * Lexer token definitions
+ */
+
+/* Whitespace characters */
 SKIP :
 {
-  " " | "\t" | "\r" 
+  " " | "\t" | "\n" | "\r" | "\f"
 }
 
+/* Comments */
+SPECIAL_TOKEN : 
+{
+  <SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")> |
+  <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/"> |
+  <DOCS_COMMENT: "/**" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/"> 
+}
+
+/* General reserved keywords and characters */
 TOKEN :
 {
-  < CLASS : "class" >
-  |
-  < EXTENDS : "extends" >
-  |
-  < PUBLIC : "public" >
-  |
-  < STATIC : "static" >
-  |
-  < VOID : "void" >
-  |
-  < MAIN : "main" >
-  |
-  < STRING : "String" >
-  |
-  < RETURN : "return" >
-  |
-  < IF : "if" >
-  |
-  < ELSE : "else" >
-  |
-  < WHILE : "while" >
-  |
-  < LENGTH : "length" >
-  |
-  < NEW : "new" >
-  | 
-  < TRUE : "true" >
-  | 
-  < FALSE : "false" >
-  | 
-  < THIS : "this" >
-  | 
-  < TYPE_INT : "int" >
-  |
-  < TYPE : <TYPE_INT> ("[" "]")? | "boolean" | <IDENTIFIER> >
-  |
-  < ARITHM_OPERATOR : "+" | "-" | "*" | "/" >
-  |
-  < COMPAR_OPERATOR : "&&" | "<" >
-  |
-  < IDENTIFIER : (["a"-"z"] | ["A"-"Z"] | "_")(["a"-"z"] | ["A"-"Z"] | ["0"-"9"] | "_")* > 
-  |
-  < INTEGER_LITERAL : <DIGITS> >
-  |
-  < BOOLEAN_LITERAL : "true" | "false" >
-  |
-  < #DIGITS : (["0"-"9"])+ >
+  < CLASS : "class" > |
+  < EXTENDS : "extends" > |
+  < PUBLIC : "public" > |
+  < STATIC : "static" > |
+  < VOID : "void" > |
+  < MAIN : "main" > |
+  < RETURN : "return" > |
+  < IF : "if" > |
+  < ELSE : "else" > |
+  < WHILE : "while" > |
+  < LENGTH : "length" > |
+  < NEW : "new" > | 
+  < TRUE : "true" > | 
+  < FALSE : "false" > | 
+  < THIS : "this" > | 
+  < DOT : "." > |
+  < NOT : "!" >
 }
+
+/* Types */
+TOKEN : {
+  < TYPE_STRING : "String" > |
+  < TYPE : "int" ("[" "]")? | "boolean" >
+}
+
+/* Operators */
+TOKEN : {
+  < LT : "<" > |
+  < AND : "&&" > |
+  < PLUS : "+" > |
+  < MINUS : "-" > |
+  < ARITHMETIC_OPERATOR : <PLUS> | <MINUS> | "*" | "/" >
+}
+
+/* Literals */
+TOKEN : {
+  < INTEGER_LITERAL : ["1"-"9"] (<DIGIT>)* | "0" > |
+  < BOOLEAN_LITERAL : "true" | "false" >
+}
+
+/* Identifiers */
+TOKEN :
+{
+  < IDENTIFIER : <LETTER> (<LETTER> | <DIGIT>)* > |
+  < #DIGIT : [ "0"-"9" ] > | 
+  < #LETTER: [ "a"-"z", "A"-"Z", "_" ] >
+}
+
+/*
+ * Grammar definition
+ */
 
 void Program() : {}
 {
@@ -99,17 +120,13 @@ void ClassDeclaration() : {}
   "}"
 }
 
-void VarDeclaration() : {}
-{
-  <TYPE> <IDENTIFIER> ";"
-}
-
 void MainDeclaration() : {}
 {
   <PUBLIC> <STATIC> <VOID> <MAIN>
-  "(" <STRING> "[" "]" <IDENTIFIER> ")" "{"
+  "(" <TYPE_STRING> "[" "]" <IDENTIFIER> ")" "{"
     (VarDeclaration())*
     (Statement())*
+    <RETURN> (<IDENTIFIER>)? ";"
   "}"
 }
 
@@ -120,8 +137,13 @@ void MethodDeclaration() : {}
   "{"
     (VarDeclaration())*
     (Statement())*
-    <RETURN> Expr() ";"
+    <RETURN> (Expr())? ";"
   "}"
+}
+
+void VarDeclaration() : {}
+{
+  <TYPE> <IDENTIFIER> ";"
 }
 
 void Statement() : {}
@@ -131,12 +153,12 @@ void Statement() : {}
   <IF> "(" Expr() ")" Statement() <ELSE> Statement()
   |
   <WHILE> "(" Expr() ")" Statement()
-  |
-  (<IDENTIFIER> ("[" Expr() "]")? "=")? Expr() ";"
+  /* | */
+  /* (<IDENTIFIER> ("[" Expr() "]")? "=")? Expr() ";" */
 }
 
 void Expr() : {}
 {
-  <TRUE>
+  <IDENTIFIER>
 }
 
