@@ -2,6 +2,8 @@ class Fac {
   public int ComputeFac(int num) {
     int num_aux ;
 
+    num_aux = num_aux;
+
     return num_aux;
   }
 
