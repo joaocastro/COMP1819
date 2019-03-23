@@ -5,30 +5,30 @@
  */
 
 options {
-  LOOKAHEAD=1;
+	LOOKAHEAD=1;
 }
 
 PARSER_BEGIN(Parser)
-  import java.io.*;
-  import java.io.InputStream;
+	import java.io.*;
+	import java.io.InputStream;
 
-  public class Parser {
-    public static void main(String args[]) throws ParseException, IOException {
-      Parser parser;
+	public class Parser {
+		public static void main(String args[]) throws ParseException, IOException {
+			Parser parser;
 
-      InputStream parserStream = (args.length == 0) ? System.in : readInputFile(args[0]);
-      parser = new Parser(parserStream);
+			InputStream parserStream = (args.length == 0) ? System.in : readInputFile(args[0]);
+			parser = new Parser(parserStream);
 
-      parser.Program();
-    }
+			parser.Program();
+		}
 
-    public static InputStream readInputFile(String inputFile) 
-      throws IOException {
-        File initialFile = new File(inputFile);
-        InputStream targetStream = new FileInputStream(initialFile);
-        return targetStream;
-      }
-  }
+		public static InputStream readInputFile(String inputFile) 
+			throws IOException {
+				File initialFile = new File(inputFile);
+				InputStream targetStream = new FileInputStream(initialFile);
+				return targetStream;
+			}
+	}
 PARSER_END(Parser)
 
 /* 
@@ -38,66 +38,67 @@ PARSER_END(Parser)
 /* Whitespace characters */
 SKIP :
 {
-  " " | "\t" | "\n" | "\r" | "\f"
+	" " | "\t" | "\n" | "\r" | "\f"
 }
 
 /* Comments */
 SPECIAL_TOKEN : 
 {
-  < SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n") > |
-  < MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/" > |
-  < DOCS_COMMENT: "/**" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/" > 
+	< SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n") > |
+	< MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/" > |
+	< DOCS_COMMENT: "/**" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/" > 
 }
 
 /* General reserved keywords and characters */
 TOKEN :
 {
-  < CLASS : "class" > |
-  < EXTENDS : "extends" > |
-  < PUBLIC : "public" > |
-  < STATIC : "static" > |
-  < VOID : "void" > |
-  < MAIN : "main" > |
-  < RETURN : "return" > |
-  < IF : "if" > |
-  < ELSE : "else" > |
-  < WHILE : "while" > |
-  < LENGTH : "length" > |
-  < NEW : "new" > | 
-  < TRUE : "true" > | 
-  < FALSE : "false" > | 
-  < THIS : "this" > | 
-  < DOT : "." > |
-  < NOT : "!" >
+	< CLASS : "class" > |
+	< EXTENDS : "extends" > |
+	< PUBLIC : "public" > |
+	< STATIC : "static" > |
+	< VOID : "void" > |
+	< MAIN : "main" > |
+	< RETURN : "return" > |
+	< IF : "if" > |
+	< ELSE : "else" > |
+	< WHILE : "while" > |
+	< LENGTH : "length" > |
+	< NEW : "new" > | 
+	< TRUE : "true" > | 
+	< FALSE : "false" > | 
+	< THIS : "this" > | 
+	< DOT : "." > |
+	< NOT : "!" >
 }
 
 /* Types */
 TOKEN : {
-  < TYPE_STRING : "String" > |
-  < TYPE : "int" ("[" "]")? | "boolean" >
+	< TYPE_STRING : "String" > |
+	<TYPE_INT : "int" >|
+	< TYPE : <TYPE_INT> ("[" "]")? | "boolean" >
 }
 
 /* Operators */
 TOKEN : {
-  < LT : "<" > |
-  < AND : "&&" > |
-  < PLUS : "+" > |
-  < MINUS : "-" > |
-  < ARITHMETIC_OPERATOR : <PLUS> | <MINUS> | "*" | "/" >
+	< LT : "<" > |
+	< AND : "&&" > |
+	< PLUS : "+" > |
+	< MINUS : "-" > |
+	< ARITHMETIC_OPERATOR : <PLUS> | <MINUS> | "*" | "/" >
 }
 
 /* Literals */
 TOKEN : {
-  < INTEGER_LITERAL : ["1"-"9"] (<DIGIT>)* | "0" > |
-  < BOOLEAN_LITERAL : "true" | "false" >
+	< INTEGER_LITERAL : ["1"-"9"] (<DIGIT>)* | "0" > |
+	< BOOLEAN_LITERAL : "true" | "false" >
 }
 
 /* Identifiers */
 TOKEN :
 {
-  < IDENTIFIER : <LETTER> (<LETTER> | <DIGIT>)* > |
-  < #DIGIT : [ "0"-"9" ] > | 
-  < #LETTER: [ "a"-"z", "A"-"Z", "_" ] >
+	< IDENTIFIER : <LETTER> (<LETTER> | <DIGIT>)* > |
+	< #DIGIT : [ "0"-"9" ] > | 
+	< #LETTER: [ "a"-"z", "A"-"Z", "_" ] >
 }
 
 /*
@@ -106,59 +107,111 @@ TOKEN :
 
 void Program() : {}
 {
-  ClassDeclaration() <EOF>
+	ClassDeclaration() <EOF>
 }
 
 void ClassDeclaration() : {} 
 {
-  <CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? "{" 
-    (VarDeclaration())*
-    (
-     LOOKAHEAD(2) 
-     MainDeclaration() | MethodDeclaration()
-    )*
-  "}"
+	<CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? "{" 
+		(VarDeclaration())*
+		(
+		 LOOKAHEAD(2) 
+		 MainDeclaration() | MethodDeclaration()
+		)*
+	"}"
 }
 
 void MainDeclaration() : {}
 {
-  <PUBLIC> <STATIC> <VOID> <MAIN>
-  "(" <TYPE_STRING> "[" "]" <IDENTIFIER> ")" "{"
-    (VarDeclaration())*
-    (Statement())*
-    <RETURN> (<IDENTIFIER>)? ";"
-  "}"
+	<PUBLIC> <STATIC> <VOID> <MAIN>
+	"(" <TYPE_STRING> "[" "]" <IDENTIFIER> ")" "{"
+		(VarDeclaration())*
+		(Statement())*
+		<RETURN> (<IDENTIFIER>)? ";"
+	"}"
 }
 
 void MethodDeclaration() : {}
 {
-  <PUBLIC> <TYPE> <IDENTIFIER> 
-  "(" (<TYPE> <IDENTIFIER> ("," <TYPE> <IDENTIFIER>)*)? ")"
-  "{"
-    (VarDeclaration())*
-    (Statement())*
-    <RETURN> (Expr())? ";"
-  "}"
+	<PUBLIC> <TYPE> <IDENTIFIER> 
+	"(" (<TYPE> <IDENTIFIER> ("," <TYPE> <IDENTIFIER>)*)? ")"
+	"{"
+		(VarDeclaration())*
+		(Statement())*
+		<RETURN> (Expr())? ";"
+	"}"
 }
 
 void VarDeclaration() : {}
 {
-  <TYPE> <IDENTIFIER> ";"
+	<TYPE> <IDENTIFIER> ";"
 }
 
 void Statement() : {}
 {
-  "{" (Statement())* "}"
-  |
-  <IF> "(" Expr() ")" Statement() <ELSE> Statement()
-  |
-  <WHILE> "(" Expr() ")" Statement()
-  |
-  (LOOKAHEAD(2) <IDENTIFIER> ("[" Expr() "]")? "=")? Expr() ";"
+	"{" (Statement())* "}"
+	|
+	<IF> "(" Expr() ")" Statement() <ELSE> Statement()
+	|
+	<WHILE> "(" Expr() ")" Statement()
+	|
+	(LOOKAHEAD(2) <IDENTIFIER> ("[" Expr() "]")? "=")? Expr() ";"
 }
 
 void Expr() : {}
 {
-  <IDENTIFIER>
+	Expr_LeftSide() 
+	(
+		ExprRec()
+/*	|  
+		Expr() "["  Expr()  "]"
+	|
+		Expr()  ".length"
+	|
+		Expr() "." <IDENTIFIER> "("  [ Expr() { "," Expr() } ] ")"
+*/ 
+	)
 }
 
+void ExprRec() : {}
+{
+	(LOOKAHEAD(2) ExprOper() Expr() ExprRec())?
+}
+
+
+/*
+Current:
+	Expr() -> Expr() ExprOper()  Expr()
+	Expr() -> Expr_LeftSide()
+New:
+	Expr()  -> Expr_LeftSide() Expr'() Expr()
+	Expr'() -> ExprOper() (Expr'() )?
+*/
+
+void Expr_LeftSide() : {}
+{
+	<INTEGER_LITERAL>
+	| "true"
+	| "false"
+	| <IDENTIFIER>
+	| "this"
+	| Expr_NEW()
+	| "!" Expr()
+	| "(" Expr() ")"
+
+}
+
+void ExprOper() : {}
+{
+	( <AND> | "<" | <ARITHMETIC_OPERATOR> )
+}
+
+void Expr_NEW() : {}
+{
+	"new"
+	(
+		(<TYPE_INT> "[" Expr() "]")  
+	|
+		(<IDENTIFIER>  "()")
+	)
+}
