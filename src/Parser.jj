@@ -74,8 +74,7 @@ TOKEN :
 /* Types */
 TOKEN : {
 	< TYPE_STRING : "String" > |
-	<TYPE_INT : "int" >|
-	< TYPE : <TYPE_INT> ("[" "]")? | "boolean" >
+	< TYPE : ("int" ("[]")?) | "boolean" >
 }
 
 /* Operators */
@@ -199,7 +198,7 @@ void Expr_NEW() : {}
 {
 	"new"
 	(
-		(<TYPE_INT> "[" Expr() "]")  
+		("int[" Expr() "]")  
 	|
 		(<IDENTIFIER>  "()")
 	)
