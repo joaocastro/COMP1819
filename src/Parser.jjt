@@ -70,13 +70,21 @@ TOKEN :
 	< FALSE : "false" > | 
 	< THIS : "this" > | 
 	< DOT : "." > |
-	< NOT : "!" >
+	< NOT : "!" > |
+	< SEMICOLON: ";" > |
+	< PARENS_OPEN : "(" > |
+	< PARENS_CLOSE : ")" > |
+	< SQBRACKET_OPEN : "[" > |
+	< SQBRACKET_CLOSE : "]" >  |
+	< BRACKET_OPEN : "{" > |
+	< BRACKET_CLOSE : "}" >
 }
 
 /* Types */
 TOKEN : {
 	< TYPE_STRING : "String" > |
-	< TYPE : ("int" ("[]")?) | "boolean" >
+	< TYPE_BOOLEAN : "boolean" > | 
+	< TYPE_INT : "int" >
 }
 
 /* Operators */
@@ -108,98 +116,135 @@ TOKEN :
  * Grammar definition
  */
 
-SimpleNode Program() : {}
+void Program() : {}
 {
-	ClassDeclaration() <EOF> { return jjtThis; }
+	ClassDecl() <EOF>
 }
 
-void ClassDeclaration() : {} 
+void ClassDecl() : {} 
 {
-	<CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? "{" 
-		(VarDeclaration())*
+	<CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? <BRACKET_OPEN>
+		(VarDecl())*
 		(
-		 LOOKAHEAD(2)
-		 MainDeclaration() | MethodDeclaration()
+			<PUBLIC>
+			(MainDecl() | MethodDecl())
 		)*
-	"}"
+	<BRACKET_CLOSE>
 }
 
-void MainDeclaration() : {}
+void MainDecl() : {}
 {
-	<PUBLIC> <STATIC> <VOID> <MAIN>
-	"(" <TYPE_STRING> "[" "]" <IDENTIFIER> ")" "{"
-		(VarDeclaration())*
-		(Statement())*
-		(<RETURN> ";")?
-	"}"
+	<STATIC> <VOID> <MAIN>
+	<PARENS_OPEN> <TYPE_STRING> <SQBRACKET_OPEN> <SQBRACKET_CLOSE> <IDENTIFIER> <PARENS_CLOSE> <BRACKET_OPEN>
+		(VarDecl())*
+		(Stmt())*
+	<BRACKET_CLOSE>
 }
 
-void MethodDeclaration() : {}
+void MethodDecl() : {}
 {
-	<PUBLIC> <TYPE> <IDENTIFIER> 
-	"(" (<TYPE> <IDENTIFIER> ("," <TYPE> <IDENTIFIER>)*)? ")"
+	Type() <IDENTIFIER> 
+	<PARENS_OPEN> (Type() <IDENTIFIER> ("," Type() <IDENTIFIER>)*)? <PARENS_CLOSE>
 	"{"
-		(VarDeclaration())*
-		(Statement())*
-		<RETURN> (Expr())? ";"
+		(VarDecl())*
+		(Stmt())*
+		<RETURN> (Expr())? <SEMICOLON>
 	"}"
 }
 
-void VarDeclaration() : {}
+void Type() : {} 
 {
-	<TYPE> <IDENTIFIER> ";"
+	<TYPE_BOOLEAN> |
+	<TYPE_INT>  (<SQBRACKET_OPEN> <SQBRACKET_CLOSE>)?
 }
 
-void Statement() : {}
+void VarDecl() : {}
 {
-	"{" (Statement())* "}"
-	|
-	<IF> "(" Expr() ")" Statement() <ELSE> Statement()
-	|
-	<WHILE> "(" Expr() ")" Statement()
-	|
-	(LOOKAHEAD(2) <IDENTIFIER> ("[" Expr() "]")? "=")? Expr() ";"
+	Type() <IDENTIFIER> <SEMICOLON>
 }
 
-void Expr() #void : {}
+void Stmt() : {}
+{
+	"{" (Stmt())* "}"
+	|
+	IfStmt()
+	|
+	WhileStmt()
+	|
+	(LOOKAHEAD(2) <IDENTIFIER> ("[" Expr() "]")? "=")? Expr() <SEMICOLON>
+}
+
+void IfStmt() : {}
+{
+	<IF> <PARENS_OPEN> Expr() <PARENS_CLOSE> Stmt() <ELSE> Stmt()
+}
+
+void WhileStmt() : {}
+{
+	<WHILE> <PARENS_OPEN> 
+	try {
+		Expr() 
+	} catch (ParseException e) {
+		error_skipto(PARENS_CLOSE);
+	}
+	<PARENS_CLOSE> Stmt()
+}
+
+void Expr() : {}
 {
 	ExprLhs() ExprRhs()
+}
+
+void ExprLhs() : {}
+{
+	<INTEGER_LITERAL> |
+	<TRUE> | 
+	<FALSE> | 
+	<IDENTIFIER> | 
+	<THIS> | 
+	ExprNew() |
+ 	<NOT> Expr() | 
+	<PARENS_OPEN> Expr() <PARENS_CLOSE>
 }
 
 void ExprRhs() : {}
 {
 	(LOOKAHEAD(2)
 	(
-		("&&" | "<" | <PLUS> | <MINUS> | <TIMES> | <DIVIDES>) Expr() ExprRhs()
+		( "&&" | "<" | <PLUS> | <MINUS> | <TIMES> | <DIVIDES>) Expr() ExprRhs()
 	|
 		("[" Expr() "]")
 	|
 		(".length")
 	|
-		("." <IDENTIFIER> "("  (Expr() ( "," Expr() )* )? ")" )
+		(<DOT> <IDENTIFIER> <PARENS_OPEN>  (Expr() ( "," Expr() )* )? <PARENS_CLOSE> )
 	))?
 }
 
-void ExprLhs() : {}
-{
-	<INTEGER_LITERAL>
-	| "true"
-	| "false"
-	| <IDENTIFIER>
-	| "this"
-	| ExprNew()
-	| "!" Expr()
-	| "(" Expr() ")"
-
-}
-
-
 void ExprNew() : {}
 {
-	"new"
+	<NEW>
 	(
-		("int[" Expr() "]")  
+		(<TYPE_INT> <SQBRACKET_OPEN> Expr() <SQBRACKET_CLOSE>)
 	|
-		(<IDENTIFIER>  "()")
+		(<IDENTIFIER>  <PARENS_OPEN> <PARENS_CLOSE>)
 	)
+}
+
+/*
+ * Errors
+ */
+
+JAVACODE
+void error_skipto(int kind) {
+  ParseException e = generateParseException();  // generate the exception object.
+  System.out.println(e.toString());  // print the error message
+  Token t;
+  do {
+    t = getNextToken();
+  } while (t.kind != kind);
+    // The above loop consumes tokens all the way up to a token of
+    // "kind".  We use a do-while loop rather than a while because the
+    // current token is the one immediately before the erroneous token
+    // (in our case the token immediately before what should have been "while").
 }
