@@ -128,7 +128,7 @@ void MainDeclaration() : {}
 	<PUBLIC> <STATIC> <VOID> <MAIN>
 	"(" <TYPE_STRING> "[" "]" <IDENTIFIER> ")" "{"
 		(VarDeclaration())*
-		(Statement())*
+		(Stmt())*
 		(<RETURN> ";")?
 	"}"
 }
@@ -139,7 +139,7 @@ void MethodDeclaration() : {}
 	"(" (<TYPE> <IDENTIFIER> ("," <TYPE> <IDENTIFIER>)*)? ")"
 	"{"
 		(VarDeclaration())*
-		(Statement())*
+		(Stmt())*
 		<RETURN> (Expr())? ";"
 	"}"
 }
@@ -149,15 +149,25 @@ void VarDeclaration() : {}
 	<TYPE> <IDENTIFIER> ";"
 }
 
-void Statement() : {}
+void Stmt() : {}
 {
-	"{" (Statement())* "}"
+	"{" (Stmt())* "}"
 	|
-	<IF> "(" Expr() ")" Statement() <ELSE> Statement()
+	IfStmt()
 	|
-	<WHILE> "(" Expr() ")" Statement()
+	WhileStmt()
 	|
 	(LOOKAHEAD(2) <IDENTIFIER> ("[" Expr() "]")? "=")? Expr() ";"
+}
+
+void IfStmt() : {}
+{
+	<IF> "(" Expr() ")" Stmt() <ELSE> Stmt()
+}
+
+void WhileStmt() : {}
+{
+	<WHILE> "(" Expr() ")" Stmt()
 }
 
 void Expr() : {}
