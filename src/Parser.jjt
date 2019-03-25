@@ -1,0 +1,225 @@
+/*
+ * Parser.jj
+ *
+ * A Java-- (MiniJava) parser.
+ */
+
+options {
+	LOOKAHEAD=1;
+  // DEBUG_PARSER=true;
+}
+
+PARSER_BEGIN(Parser)
+	import java.io.*;
+	import java.io.InputStream;
+
+	public class Parser {
+		public static void main(String args[]) throws ParseException, IOException {
+			Parser parser;
+
+			InputStream parserStream = (args.length == 0) ? System.in : readInputFile(args[0]);
+			parser = new Parser(parserStream);
+
+			SimpleNode root = parser.Program();
+      root.dump("");
+		}
+
+    int eval(SimpleNode node) {
+      if (node.jjtGetNumChildren() == 0) // Leaf node with integer value
+        return node.val;
+      
+      if (node.jjtGetNumChildren() == 1) // Only one child
+        return this.eval((SimpleNode) node.jjtGetChild(0));
+
+      SimpleNode lhs = (SimpleNode) node.jjtGetChild(0);
+      SimpleNode rhs = (SimpleNode) node.jjtGetChild(1);
+
+      // TODO: Fill this with all of the potential cases
+      switch (node.id) {
+        default: // Abort
+          System.out.println("Illegal operator");
+          System.exit(1);
+      }
+
+      return 0;
+    }
+
+		public static InputStream readInputFile(String inputFile) 
+			throws IOException {
+				File initialFile = new File(inputFile);
+				InputStream targetStream = new FileInputStream(initialFile);
+				return targetStream;
+			}
+	}
+PARSER_END(Parser)
+
+/* 
+ * Lexer token definitions
+ */
+
+/* Whitespace characters */
+SKIP :
+{
+	" " | "\t" | "\n" | "\r" | "\f"
+}
+
+/* Comments */
+SPECIAL_TOKEN : 
+{
+	< SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n") > |
+	< MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/" > |
+	< DOCS_COMMENT: "/**" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/" > 
+}
+
+/* General reserved keywords and characters */
+TOKEN :
+{
+	< CLASS : "class" > |
+	< EXTENDS : "extends" > |
+	< PUBLIC : "public" > |
+	< STATIC : "static" > |
+	< VOID : "void" > |
+	< MAIN : "main" > |
+	< RETURN : "return" > |
+	< IF : "if" > |
+	< ELSE : "else" > |
+	< WHILE : "while" > |
+	< LENGTH : "length" > |
+	< NEW : "new" > | 
+	< TRUE : "true" > | 
+	< FALSE : "false" > | 
+	< THIS : "this" > | 
+	< DOT : "." > |
+	< NOT : "!" >
+}
+
+/* Types */
+TOKEN : {
+	< TYPE_STRING : "String" > |
+	< TYPE : ("int" ("[]")?) | "boolean" >
+}
+
+/* Operators */
+TOKEN : {
+	< LT : "<" > |
+	< AND : "&&" > |
+	< PLUS : "+" > |
+	< MINUS : "-" > |
+	< TIMES : "*" > |
+	< DIVIDES : "/" > |
+	< ARITHMETIC_OPERATOR : <PLUS> | <MINUS> | <TIMES> | <DIVIDES> >
+}
+
+/* Literals */
+TOKEN : {
+	< INTEGER_LITERAL : ["1"-"9"] (<DIGIT>)* | "0" > |
+	< BOOLEAN_LITERAL : "true" | "false" >
+}
+
+/* Identifiers */
+TOKEN :
+{
+	< IDENTIFIER : <LETTER> (<LETTER> | <DIGIT>)* > |
+	< #DIGIT : [ "0"-"9" ] > | 
+	< #LETTER: [ "a"-"z", "A"-"Z", "_" ] >
+}
+
+/*
+ * Grammar definition
+ */
+
+SimpleNode Program() : {}
+{
+	ClassDeclaration() <EOF> { return jjtThis; }
+}
+
+void ClassDeclaration() : {} 
+{
+	<CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? "{" 
+		(VarDeclaration())*
+		(
+		 LOOKAHEAD(2)
+		 MainDeclaration() | MethodDeclaration()
+		)*
+	"}"
+}
+
+void MainDeclaration() : {}
+{
+	<PUBLIC> <STATIC> <VOID> <MAIN>
+	"(" <TYPE_STRING> "[" "]" <IDENTIFIER> ")" "{"
+		(VarDeclaration())*
+		(Statement())*
+		(<RETURN> ";")?
+	"}"
+}
+
+void MethodDeclaration() : {}
+{
+	<PUBLIC> <TYPE> <IDENTIFIER> 
+	"(" (<TYPE> <IDENTIFIER> ("," <TYPE> <IDENTIFIER>)*)? ")"
+	"{"
+		(VarDeclaration())*
+		(Statement())*
+		<RETURN> (Expr())? ";"
+	"}"
+}
+
+void VarDeclaration() : {}
+{
+	<TYPE> <IDENTIFIER> ";"
+}
+
+void Statement() : {}
+{
+	"{" (Statement())* "}"
+	|
+	<IF> "(" Expr() ")" Statement() <ELSE> Statement()
+	|
+	<WHILE> "(" Expr() ")" Statement()
+	|
+	(LOOKAHEAD(2) <IDENTIFIER> ("[" Expr() "]")? "=")? Expr() ";"
+}
+
+void Expr() #void : {}
+{
+	ExprLhs() ExprRhs()
+}
+
+void ExprRhs() : {}
+{
+	(LOOKAHEAD(2)
+	(
+		("&&" | "<" | <PLUS> | <MINUS> | <TIMES> | <DIVIDES>) Expr() ExprRhs()
+	|
+		("[" Expr() "]")
+	|
+		(".length")
+	|
+		("." <IDENTIFIER> "("  (Expr() ( "," Expr() )* )? ")" )
+	))?
+}
+
+void ExprLhs() : {}
+{
+	<INTEGER_LITERAL>
+	| "true"
+	| "false"
+	| <IDENTIFIER>
+	| "this"
+	| ExprNew()
+	| "!" Expr()
+	| "(" Expr() ")"
+
+}
+
+
+void ExprNew() : {}
+{
+	"new"
+	(
+		("int[" Expr() "]")  
+	|
+		(<IDENTIFIER>  "()")
+	)
+}
