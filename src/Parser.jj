@@ -69,7 +69,8 @@ TOKEN :
 	< FALSE : "false" > | 
 	< THIS : "this" > | 
 	< DOT : "." > |
-	< NOT : "!" >
+	< NOT : "!" > |
+	< SEMICOLON: ";" >
 }
 
 /* Types */
@@ -129,7 +130,7 @@ void MainDeclaration() : {}
 	"(" <TYPE_STRING> "[" "]" <IDENTIFIER> ")" "{"
 		(VarDeclaration())*
 		(Stmt())*
-		(<RETURN> ";")?
+		(<RETURN> <SEMICOLON>)?
 	"}"
 }
 
@@ -140,13 +141,13 @@ void MethodDeclaration() : {}
 	"{"
 		(VarDeclaration())*
 		(Stmt())*
-		<RETURN> (Expr())? ";"
+		<RETURN> (Expr())? <SEMICOLON>
 	"}"
 }
 
 void VarDeclaration() : {}
 {
-	<TYPE> <IDENTIFIER> ";"
+	<TYPE> <IDENTIFIER> <SEMICOLON>
 }
 
 void Stmt() : {}
@@ -157,7 +158,7 @@ void Stmt() : {}
 	|
 	WhileStmt()
 	|
-	(LOOKAHEAD(2) <IDENTIFIER> ("[" Expr() "]")? "=")? Expr() ";"
+	(LOOKAHEAD(2) <IDENTIFIER> ("[" Expr() "]")? "=")? Expr() <SEMICOLON>
 }
 
 void IfStmt() : {}
