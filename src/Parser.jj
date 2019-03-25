@@ -162,14 +162,14 @@ void Statement() : {}
 
 void Expr() : {}
 {
-	Expr_LeftSide() ExprRec()
+	ExprLhs() ExprRhs()
 }
 
-void ExprRec() : {}
+void ExprRhs() : {}
 {
 	(LOOKAHEAD(2)
 	(
-		( "&&" | "<" | <PLUS> | <MINUS> | <TIMES> | <DIVIDES>) Expr() ExprRec()
+		( "&&" | "<" | <PLUS> | <MINUS> | <TIMES> | <DIVIDES>) Expr() ExprRhs()
 	|
 		("[" Expr() "]")
 	|
@@ -179,21 +179,21 @@ void ExprRec() : {}
 	))?
 }
 
-void Expr_LeftSide() : {}
+void ExprLhs() : {}
 {
 	<INTEGER_LITERAL>
 	| "true"
 	| "false"
 	| <IDENTIFIER>
 	| "this"
-	| Expr_NEW()
+	| ExprNew()
 	| "!" Expr()
 	| "(" Expr() ")"
 
 }
 
 
-void Expr_NEW() : {}
+void ExprNew() : {}
 {
 	"new"
 	(
