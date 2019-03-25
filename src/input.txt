@@ -4,6 +4,8 @@ class Fac {
 
 		a[0] = 1;
 
+		a = new int[/* */];
+
 		if (num < 1)
 			num_aux = 1;
 		else

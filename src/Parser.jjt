@@ -6,7 +6,7 @@
 
 options {
 	LOOKAHEAD=1;
-  // DEBUG_PARSER=true;
+  DEBUG_PARSER=true;
 }
 
 PARSER_BEGIN(Parser)
@@ -70,6 +70,7 @@ TOKEN :
 	< FALSE : "false" > | 
 	< THIS : "this" > | 
 	< DOT : "." > |
+	< COMMA: "," > |
 	< NOT : "!" > |
 	< SEMICOLON: ";" > |
 	< PARENS_OPEN : "(" > |
@@ -77,7 +78,8 @@ TOKEN :
 	< SQBRACKET_OPEN : "[" > |
 	< SQBRACKET_CLOSE : "]" >  |
 	< BRACKET_OPEN : "{" > |
-	< BRACKET_CLOSE : "}" >
+	< BRACKET_CLOSE : "}" > |
+	< EQUALS : "=" >
 }
 
 /* Types */
@@ -116,7 +118,7 @@ TOKEN :
  * Grammar definition
  */
 
-void Program() : {}
+SimpleNode Program() : {}
 {
 	ClassDecl() <EOF>
 }
@@ -144,17 +146,18 @@ void MainDecl() : {}
 void MethodDecl() : {}
 {
 	Type() <IDENTIFIER> 
-	<PARENS_OPEN> (Type() <IDENTIFIER> ("," Type() <IDENTIFIER>)*)? <PARENS_CLOSE>
-	"{"
+	<PARENS_OPEN> (Type() <IDENTIFIER> (<COMMA> Type() <IDENTIFIER>)*)? <PARENS_CLOSE>
+	<BRACKET_OPEN>
 		(VarDecl())*
 		(Stmt())*
 		<RETURN> (Expr())? <SEMICOLON>
-	"}"
+	<BRACKET_CLOSE>
 }
 
 void Type() : {} 
 {
-	<TYPE_BOOLEAN> |
+	<TYPE_BOOLEAN> 
+	|
 	<TYPE_INT>  (<SQBRACKET_OPEN> <SQBRACKET_CLOSE>)?
 }
 
@@ -165,13 +168,13 @@ void VarDecl() : {}
 
 void Stmt() : {}
 {
-	"{" (Stmt())* "}"
+	<BRACKET_OPEN> (Stmt())* <BRACKET_CLOSE>
 	|
 	IfStmt()
 	|
 	WhileStmt()
 	|
-	(LOOKAHEAD(2) <IDENTIFIER> ("[" Expr() "]")? "=")? Expr() <SEMICOLON>
+	(LOOKAHEAD(2) <IDENTIFIER> (<SQBRACKET_OPEN> Expr() <SQBRACKET_CLOSE>)? <EQUALS>)? Expr() <SEMICOLON>
 }
 
 void IfStmt() : {}
@@ -185,14 +188,26 @@ void WhileStmt() : {}
 	try {
 		Expr() 
 	} catch (ParseException e) {
-		error_skipto(PARENS_CLOSE);
+		error_skipto(BRACKET_OPEN);
 	}
-	<PARENS_CLOSE> Stmt()
+	<PARENS_CLOSE> <BRACKET_OPEN> Stmt() <BRACKET_CLOSE>
 }
 
 void Expr() : {}
 {
+	ExprNew() (ExprDot())?
+	|
 	ExprLhs() ExprRhs()
+}
+
+void ExprDot() : {}
+{
+	<DOT> 
+	(
+	"length"
+	|
+	<IDENTIFIER> <PARENS_OPEN> (Expr() (<COMMA> Expr() )* )? <PARENS_CLOSE>
+	)
 }
 
 void ExprLhs() : {}
@@ -200,9 +215,8 @@ void ExprLhs() : {}
 	<INTEGER_LITERAL> |
 	<TRUE> | 
 	<FALSE> | 
-	<IDENTIFIER> | 
-	<THIS> | 
-	ExprNew() |
+  <IDENTIFIER> | 
+	<THIS> | 	
  	<NOT> Expr() | 
 	<PARENS_OPEN> Expr() <PARENS_CLOSE>
 }
@@ -211,13 +225,11 @@ void ExprRhs() : {}
 {
 	(LOOKAHEAD(2)
 	(
-		( "&&" | "<" | <PLUS> | <MINUS> | <TIMES> | <DIVIDES>) Expr() ExprRhs()
+	( "&&" | "<" | <PLUS> | <MINUS> | <TIMES> | <DIVIDES>) Expr() ExprRhs()
 	|
-		("[" Expr() "]")
+	<SQBRACKET_OPEN> Expr() <SQBRACKET_CLOSE>
 	|
-		(".length")
-	|
-		(<DOT> <IDENTIFIER> <PARENS_OPEN>  (Expr() ( "," Expr() )* )? <PARENS_CLOSE> )
+	ExprDot()
 	))?
 }
 
@@ -225,9 +237,9 @@ void ExprNew() : {}
 {
 	<NEW>
 	(
-		(<TYPE_INT> <SQBRACKET_OPEN> Expr() <SQBRACKET_CLOSE>)
+	<TYPE_INT> <SQBRACKET_OPEN> (Expr())? <SQBRACKET_CLOSE>
 	|
-		(<IDENTIFIER>  <PARENS_OPEN> <PARENS_CLOSE>)
+	<IDENTIFIER>  <PARENS_OPEN> <PARENS_CLOSE>
 	)
 }
 
