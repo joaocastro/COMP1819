@@ -6,7 +6,7 @@
 
 options {
 	LOOKAHEAD=1;
-//	DEBUG_PARSER=true;
+ 	DEBUG_PARSER=true;
 }
 
 PARSER_BEGIN(Parser)
@@ -70,13 +70,20 @@ TOKEN :
 	< THIS : "this" > | 
 	< DOT : "." > |
 	< NOT : "!" > |
-	< SEMICOLON: ";" >
+	< SEMICOLON: ";" > |
+	< PARENS_OPEN : "(" > |
+	< PARENS_CLOSE : ")" > |
+	< SQBRACKET_OPEN : "[" > |
+	< SQBRACKET_CLOSE : "]" >  |
+	< BRACKET_OPEN : "{" > |
+	< BRACKET_CLOSE : "}" >
 }
 
 /* Types */
 TOKEN : {
 	< TYPE_STRING : "String" > |
-	< TYPE : ("int" ("[]")?) | "boolean" >
+	< TYPE_BOOLEAN : "boolean" > | 
+	< TYPE_INT : "int" >
 }
 
 /* Operators */
@@ -110,44 +117,49 @@ TOKEN :
 
 void Program() : {}
 {
-	ClassDeclaration() <EOF>
+	ClassDecl() <EOF>
 }
 
-void ClassDeclaration() : {} 
+void ClassDecl() : {} 
 {
-	<CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? "{" 
-		(VarDeclaration())*
+	<CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? <BRACKET_OPEN>
+		(VarDecl())*
 		(
-		 LOOKAHEAD(2)
-		 MainDeclaration() | MethodDeclaration()
+			<PUBLIC>
+			(MainDecl() | MethodDecl())
 		)*
-	"}"
+	<BRACKET_CLOSE>
 }
 
-void MainDeclaration() : {}
+void MainDecl() : {}
 {
-	<PUBLIC> <STATIC> <VOID> <MAIN>
-	"(" <TYPE_STRING> "[" "]" <IDENTIFIER> ")" "{"
-		(VarDeclaration())*
+	<STATIC> <VOID> <MAIN>
+	<PARENS_OPEN> <TYPE_STRING> <SQBRACKET_OPEN> <SQBRACKET_CLOSE> <IDENTIFIER> <PARENS_CLOSE> <BRACKET_OPEN>
+		(VarDecl())*
 		(Stmt())*
-		(<RETURN> <SEMICOLON>)?
-	"}"
+	<BRACKET_CLOSE>
 }
 
-void MethodDeclaration() : {}
+void MethodDecl() : {}
 {
-	<PUBLIC> <TYPE> <IDENTIFIER> 
-	"(" (<TYPE> <IDENTIFIER> ("," <TYPE> <IDENTIFIER>)*)? ")"
+	Type() <IDENTIFIER> 
+	<PARENS_OPEN> (Type() <IDENTIFIER> ("," Type() <IDENTIFIER>)*)? <PARENS_CLOSE>
 	"{"
-		(VarDeclaration())*
+		(VarDecl())*
 		(Stmt())*
 		<RETURN> (Expr())? <SEMICOLON>
 	"}"
 }
 
-void VarDeclaration() : {}
+void Type() : {} 
 {
-	<TYPE> <IDENTIFIER> <SEMICOLON>
+	<TYPE_BOOLEAN> |
+	<TYPE_INT>  (<SQBRACKET_OPEN> <SQBRACKET_CLOSE>)?
+}
+
+void VarDecl() : {}
+{
+	Type() <IDENTIFIER> <SEMICOLON>
 }
 
 void Stmt() : {}
@@ -163,21 +175,35 @@ void Stmt() : {}
 
 void IfStmt() : {}
 {
-	<IF> "(" Expr() ")" Stmt() <ELSE> Stmt()
+	<IF> <PARENS_OPEN> Expr() <PARENS_CLOSE> Stmt() <ELSE> Stmt()
 }
 
 void WhileStmt() : {}
 {
+	<WHILE> <PARENS_OPEN> 
 	try {
-		<WHILE> "(" Expr() ")" Stmt()
+		Expr() 
 	} catch (ParseException e) {
-		error_skipto(SEMICOLON);
+		error_skipto(PARENS_CLOSE);
 	}
+	<PARENS_CLOSE> Stmt()
 }
 
 void Expr() : {}
 {
 	ExprLhs() ExprRhs()
+}
+
+void ExprLhs() : {}
+{
+	<INTEGER_LITERAL> |
+	<TRUE> | 
+	<FALSE> | 
+	<IDENTIFIER> | 
+	<THIS> | 
+	ExprNew() |
+ 	<NOT> Expr() | 
+	<PARENS_OPEN> Expr() <PARENS_CLOSE>
 }
 
 void ExprRhs() : {}
@@ -190,31 +216,17 @@ void ExprRhs() : {}
 	|
 		(".length")
 	|
-		("." <IDENTIFIER> "("  (Expr() ( "," Expr() )* )? ")" )
+		(<DOT> <IDENTIFIER> <PARENS_OPEN>  (Expr() ( "," Expr() )* )? <PARENS_CLOSE> )
 	))?
 }
 
-void ExprLhs() : {}
-{
-	<INTEGER_LITERAL>
-	| "true"
-	| "false"
-	| <IDENTIFIER>
-	| "this"
-	| ExprNew()
-	| "!" Expr()
-	| "(" Expr() ")"
-
-}
-
-
 void ExprNew() : {}
 {
-	"new"
+	<NEW>
 	(
-		("int[" Expr() "]")  
+		(<TYPE_INT> <SQBRACKET_OPEN> Expr() <SQBRACKET_CLOSE>)
 	|
-		(<IDENTIFIER>  "()")
+		(<IDENTIFIER>  <PARENS_OPEN> <PARENS_CLOSE>)
 	)
 }
 
