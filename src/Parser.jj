@@ -6,6 +6,7 @@
 
 options {
 	LOOKAHEAD=1;
+//	DEBUG_PARSER=true;
 }
 
 PARSER_BEGIN(Parser)
@@ -83,7 +84,9 @@ TOKEN : {
 	< AND : "&&" > |
 	< PLUS : "+" > |
 	< MINUS : "-" > |
-	< ARITHMETIC_OPERATOR : <PLUS> | <MINUS> | "*" | "/" >
+	< TIMES : "*" > |
+	< DIVIDES : "/" > |
+	< ARITHMETIC_OPERATOR : <PLUS> | <MINUS> | <TIMES> | <DIVIDES> >
 }
 
 /* Literals */
@@ -114,7 +117,7 @@ void ClassDeclaration() : {}
 	<CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? "{" 
 		(VarDeclaration())*
 		(
-		 LOOKAHEAD(2) 
+		 LOOKAHEAD(2)
 		 MainDeclaration() | MethodDeclaration()
 		)*
 	"}"
@@ -126,7 +129,7 @@ void MainDeclaration() : {}
 	"(" <TYPE_STRING> "[" "]" <IDENTIFIER> ")" "{"
 		(VarDeclaration())*
 		(Statement())*
-		<RETURN> (<IDENTIFIER>)? ";"
+		(<RETURN> ";")?
 	"}"
 }
 
@@ -166,7 +169,7 @@ void ExprRec() : {}
 {
 	(LOOKAHEAD(2)
 	(
-		(ExprOper() Expr() ExprRec())
+		( "&&" | "<" | <PLUS> | <MINUS> | <TIMES> | <DIVIDES>) Expr() ExprRec()
 	|
 		("[" Expr() "]")
 	|
@@ -189,10 +192,6 @@ void Expr_LeftSide() : {}
 
 }
 
-void ExprOper() : {}
-{
-	( <AND> | "<" | <ARITHMETIC_OPERATOR> )
-}
 
 void Expr_NEW() : {}
 {
