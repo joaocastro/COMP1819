@@ -23,27 +23,7 @@ PARSER_BEGIN(Parser)
 			SimpleNode root = parser.Program();
       root.dump("");
 		}
-
-    int eval(SimpleNode node) {
-      if (node.jjtGetNumChildren() == 0) // Leaf node with integer value
-        return node.val;
-      
-      if (node.jjtGetNumChildren() == 1) // Only one child
-        return this.eval((SimpleNode) node.jjtGetChild(0));
-
-      SimpleNode lhs = (SimpleNode) node.jjtGetChild(0);
-      SimpleNode rhs = (SimpleNode) node.jjtGetChild(1);
-
-      // TODO: Fill this with all of the potential cases
-      switch (node.id) {
-        default: // Abort
-          System.out.println("Illegal operator");
-          System.exit(1);
-      }
-
-      return 0;
-    }
-
+    
 		public static InputStream readInputFile(String inputFile) 
 			throws IOException {
 				File initialFile = new File(inputFile);
