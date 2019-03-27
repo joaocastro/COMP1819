@@ -4,7 +4,7 @@ all: $(PROG)
 
 $(PROG): 
 	cd src && \
-	jjtree src/Parser.jjt && \
+	jjtree Parser.jjt && \
 	javacc Parser.jj && \
 	javac *.java && \
 	cd ..
