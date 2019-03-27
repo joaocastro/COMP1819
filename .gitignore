@@ -1,2 +1,4 @@
 src/*.java
+!src/SimpleNode.java
 src/*.class
+src/Parser.jj
