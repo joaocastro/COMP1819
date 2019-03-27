@@ -21,7 +21,7 @@ PARSER_BEGIN(Parser)
 			parser = new Parser(parserStream);
 
 			SimpleNode root = parser.Program();
-      root.dump("");
+			root.dump("");
 		}
     
 		public static InputStream readInputFile(String inputFile) 
@@ -73,13 +73,13 @@ TOKEN :
 	< COMMA: "," > |
 	< NOT : "!" > |
 	< SEMICOLON: ";" > |
-	< PARENS_OPEN : "(" > |
-	< PARENS_CLOSE : ")" > |
-	< SQBRACKET_OPEN : "[" > |
-	< SQBRACKET_CLOSE : "]" >  |
-	< BRACKET_OPEN : "{" > |
-	< BRACKET_CLOSE : "}" > |
-	< EQUALS : "=" >
+	< LPARENS : "(" > |
+	< RPARENS : ")" > |
+	< LSQPARENS : "[" > |
+	< RSQPARENS : "]" >  |
+	< LBRACKET : "{" > |
+	< RBRACKET : "}" > |
+	< EQUALS : "=" > 
 }
 
 /* Types */
@@ -91,7 +91,7 @@ TOKEN : {
 
 /* Operators */
 TOKEN : {
-	< LT : "<" > |
+	< LESSTHAN : "<" > |
 	< AND : "&&" > |
 	< PLUS : "+" > |
 	< MINUS : "-" > |
@@ -120,45 +120,45 @@ TOKEN :
 
 SimpleNode Program() : {}
 {
-	ClassDecl() <EOF>
+	ClassDecl() <EOF> { return jjtThis; }
 }
 
 void ClassDecl() : {} 
 {
-	<CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? <BRACKET_OPEN>
+	<CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? <LBRACKET>
 		(VarDecl())*
 		(
 			<PUBLIC>
 			(MainDecl() | MethodDecl())
 		)*
-	<BRACKET_CLOSE>
+	<RBRACKET>
 }
 
 void MainDecl() : {}
 {
 	<STATIC> <VOID> <MAIN>
-	<PARENS_OPEN> <TYPE_STRING> <SQBRACKET_OPEN> <SQBRACKET_CLOSE> <IDENTIFIER> <PARENS_CLOSE> <BRACKET_OPEN>
+	<LPARENS> <TYPE_STRING> <LSQPARENS> <RSQPARENS> <IDENTIFIER> <RPARENS> <LBRACKET>
 		(VarDecl())*
 		(Stmt())*
-	<BRACKET_CLOSE>
+	<RBRACKET>
 }
 
 void MethodDecl() : {}
 {
 	Type() <IDENTIFIER> 
-	<PARENS_OPEN> (Type() <IDENTIFIER> (<COMMA> Type() <IDENTIFIER>)*)? <PARENS_CLOSE>
-	<BRACKET_OPEN>
+	<LPARENS> (Type() <IDENTIFIER> (<COMMA> Type() <IDENTIFIER>)*)? <RPARENS>
+	<LBRACKET>
 		(VarDecl())*
 		(Stmt())*
 		<RETURN> (Expr())? <SEMICOLON>
-	<BRACKET_CLOSE>
+	<RBRACKET>
 }
 
 void Type() : {} 
 {
 	<TYPE_BOOLEAN> 
 	|
-	<TYPE_INT>  (<SQBRACKET_OPEN> <SQBRACKET_CLOSE>)?
+	<TYPE_INT>  (<LSQPARENS> <RSQPARENS>)?
 }
 
 void VarDecl() : {}
@@ -168,79 +168,97 @@ void VarDecl() : {}
 
 void Stmt() : {}
 {
-	<BRACKET_OPEN> (Stmt())* <BRACKET_CLOSE>
+	<LBRACKET> (Stmt())* <RBRACKET>
 	|
 	IfStmt()
 	|
 	WhileStmt()
 	|
-	(LOOKAHEAD(2) <IDENTIFIER> (<SQBRACKET_OPEN> Expr() <SQBRACKET_CLOSE>)? <EQUALS>)? Expr() <SEMICOLON>
+	(LOOKAHEAD(2) <IDENTIFIER> (<LSQPARENS> Expr() <RSQPARENS>)? <EQUALS>)? Expr() <SEMICOLON>
 }
 
 void IfStmt() : {}
 {
-	<IF> <PARENS_OPEN> Expr() <PARENS_CLOSE> Stmt() <ELSE> Stmt()
+	<IF> <LPARENS> Expr() <RPARENS> Stmt() <ELSE> Stmt()
 }
 
 void WhileStmt() : {}
 {
-	<WHILE> <PARENS_OPEN> 
+	<WHILE> <LPARENS> 
 	try {
 		Expr() 
 	} catch (ParseException e) {
-		error_skipto(BRACKET_OPEN);
+		error_skipto(LBRACKET);
 	}
-	<PARENS_CLOSE> <BRACKET_OPEN> Stmt() <BRACKET_CLOSE>
+	<RPARENS> Stmt()
 }
 
 void Expr() : {}
 {
-	ExprNew() (ExprDot())?
-	|
-	ExprLhs() ExprRhs()
+	ExprAnd()
 }
 
-void ExprDot() : {}
+void ExprAnd() : {}
 {
-	<DOT> 
-	(
-	"length"
-	|
-	<IDENTIFIER> <PARENS_OPEN> (Expr() (<COMMA> Expr() )* )? <PARENS_CLOSE>
-	)
+	ExprRelation() (<AND> ExprRelation())*
 }
 
-void ExprLhs() : {}
+void ExprRelation() : {}
+{
+	ExprAdditive() (<LESSTHAN> ExprAdditive())*
+}
+
+void ExprAdditive() : {}
+{
+	ExprMultiplicative() 
+	(
+		<PLUS> ExprMultiplicative()
+		|
+		<MINUS> ExprMultiplicative()
+	)*
+}
+
+void ExprMultiplicative() : {}
+{
+	ExprUnary() 
+	(
+		<TIMES> ExprUnary()
+	)*
+}
+
+void ExprUnary() : {}
+{
+	(<NOT>)*
+	ExprSuffix()
+}
+
+void ExprSuffix() : {}
+{
+	ExprPrefix()
+	(
+		<LSQPARENS> Expr() <RSQPARENS>
+		|
+		LOOKAHEAD(2)
+		<DOT> 
+		(
+		<LENGTH>
+		|
+		<IDENTIFIER> <LPARENS> (Expr() (<COMMA> Expr())* )? <RPARENS>
+		)	
+	)*
+}
+
+void ExprPrefix() : {}
 {
 	<INTEGER_LITERAL> |
 	<TRUE> | 
 	<FALSE> | 
   <IDENTIFIER> | 
-	<THIS> | 	
- 	<NOT> Expr() | 
-	<PARENS_OPEN> Expr() <PARENS_CLOSE>
-}
-
-void ExprRhs() : {}
-{
-	(LOOKAHEAD(2)
-	(
-	( "&&" | "<" | <PLUS> | <MINUS> | <TIMES> | <DIVIDES>) Expr() ExprRhs()
-	|
-	<SQBRACKET_OPEN> Expr() <SQBRACKET_CLOSE>
-	|
-	ExprDot()
-	))?
-}
-
-void ExprNew() : {}
-{
-	<NEW>
-	(
-	<TYPE_INT> <SQBRACKET_OPEN> (Expr())? <SQBRACKET_CLOSE>
-	|
-	<IDENTIFIER>  <PARENS_OPEN> <PARENS_CLOSE>
-	)
+	<THIS> |
+	<LPARENS> Expr() <RPARENS> |
+	LOOKAHEAD(2)
+	<NEW> <TYPE_INT> <LSQPARENS> (Expr())? <RSQPARENS> |
+	<NEW> <IDENTIFIER> <LPARENS> <RPARENS>
 }
 
 /*
