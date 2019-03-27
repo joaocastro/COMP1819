@@ -17,8 +17,8 @@ java Parser <jmm file>
 
 ### With `make` 
 
-You can also use `make` to generate the parser and `make test` to run it through
-the test input file ([`src/input.txt`](src/input.txt)).
+You can also use `make` to generate the parser and `make run` to run it through
+the sample test files in the [`test/`](test/) directory.
 
 [minijava]: http://www.cs.tufts.edu/~sguyer/classes/comp181-2006/minijava.html
 [javacc]: https://javacc.org/
