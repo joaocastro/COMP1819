@@ -1,16 +1,29 @@
 PROG := jmm
 
-TEST_DIR = tests
+TEST_DIR = test
 
-DEFAULT_INPUT = $(TEST_DIR)/input.txt
-INPUT1 = $(TEST_DIR)/input.txt
-INPUT2 = $(TEST_DIR)/input.txt
+INPUT1 = $(TEST_DIR)/Random.jmm
+INPUT2 = $(TEST_DIR)/HelloWorld.jmm
+INPUT3 = $(TEST_DIR)/MonteCarlo.jmm
+INPUT4 = $(TEST_DIR)/FindMaximum.jmm
 
-
-#Used for input file
-ifeq ($(INPUT), )
-	INPUT = $(DEFAULT_INPUT)
+# Used for IN file
+ifeq ($(IN), )
+	IN = $(INPUT1)
 endif
+ifeq ($(IN), 1)
+	IN = $(INPUT1)
+endif
+ifeq ($(IN), 2)
+	IN = $(INPUT2)
+endif
+ifeq ($(IN), 3)
+	IN = $(INPUT3)
+endif
+ifeq ($(IN), 4)
+	IN = $(INPUT4)
+endif
+
 
 all: $(PROG)
 
@@ -21,7 +34,7 @@ $(PROG):
 	javac *.java && \
 	cd ..
 
-test:
+run:
 	cd src && \
-	java Parser $(INPUT) && \
+	java Parser ../$(IN) && \
 	cd ..

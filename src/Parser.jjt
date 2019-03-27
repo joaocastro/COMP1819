@@ -6,7 +6,6 @@
 
 options {
 	LOOKAHEAD=1;
-  DEBUG_PARSER=true;
 }
 
 PARSER_BEGIN(Parser)
@@ -154,7 +153,7 @@ void MethodDecl() : {}
 	<RBRACKET>
 }
 
-void Type() : {} 
+void Type() #void : {} 
 {
 	<TYPE_BOOLEAN> 
 	|
@@ -193,7 +192,7 @@ void WhileStmt() : {}
 	<RPARENS> Stmt()
 }
 
-void Expr() : {}
+void Expr() #MyExpr : {}
 {
 	ExprAnd()
 }
