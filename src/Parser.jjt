@@ -122,7 +122,7 @@ SimpleNode Program() : {}
 	ClassDecl() <EOF> { return jjtThis; }
 }
 
-void ClassDecl() : {} 
+void ClassDecl() #Class : {} 
 {
 	<CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? <LBRACKET>
 		(VarDecl())*
@@ -130,7 +130,7 @@ void ClassDecl() : {}
 	<RBRACKET>
 }
 
-void MainDecl() : {}
+void MainDecl() #Main : {}
 {
 	<STATIC> <VOID> <MAIN>
 	<LPARENS> <TYPE_STRING> <LSQPARENS> <RSQPARENS> <IDENTIFIER> <RPARENS> <LBRACKET>
@@ -139,9 +139,9 @@ void MainDecl() : {}
 	<RBRACKET>
 }
 
-void MethodDecl() : {}
+void MethodDecl() #Method : {}
 {
-	Type() <IDENTIFIER> 
+	Type() <IDENTIFIER> #MethodName
 	<LPARENS> (Type() <IDENTIFIER> (<COMMA> Type() <IDENTIFIER>)*)? <RPARENS>
 	<LBRACKET>
 		(LOOKAHEAD(2) VarDecl())*
@@ -150,7 +150,7 @@ void MethodDecl() : {}
 	<RBRACKET>
 }
 
-void Type() : {} 
+void Type() #void : {} 
 {
 	LOOKAHEAD(2)
 	<TYPE_INT>  (<LSQPARENS> <RSQPARENS>)?
@@ -160,12 +160,12 @@ void Type() : {}
 	<IDENTIFIER>
 }
 
-void VarDecl() : {}
+void VarDecl() #VariableDeclaration : {}
 {
-	Type() <IDENTIFIER> <SEMICOLON>
+	Type() <IDENTIFIER> #VariableName <SEMICOLON>
 }
 
-void Stmt() : {}
+void Stmt() #void : {}
 {
 	Block()
 	|
@@ -173,55 +173,60 @@ void Stmt() : {}
 	AssignStmt()
 	|
 	LOOKAHEAD(2)
-	Expr() <SEMICOLON>
+	ExprStmt()
 	|
 	IfStmt()
 	|
 	WhileStmt()
 }
 
-void Block() : {}
+void Block() #void : {}
 {
 	<LBRACKET> (Stmt())* <RBRACKET>
 }
 
 void AssignStmt() : {}
 {
-	<IDENTIFIER> (<LSQPARENS> Expr() <RSQPARENS>)? <ASSIGN> Expr() <SEMICOLON>
+	<IDENTIFIER> (<LSQPARENS> Expr() <RSQPARENS>)? #Lhs <ASSIGN> Expr() #Rhs <SEMICOLON>
+}
+
+void ExprStmt() : {}
+{
+	Expr() <SEMICOLON>
 }
 
 void IfStmt() : {}
 {
-	<IF> <LPARENS> Expr() <RPARENS> Stmt() <ELSE> Stmt()
+	<IF> <LPARENS> Expr() #IfCondition <RPARENS> Stmt() <ELSE> Stmt()
 }
 
 void WhileStmt() : {}
 {
 	<WHILE> <LPARENS> 
 	try {
-		Expr() 
+		Expr() #WhileCondition 
 	} catch (ParseException e) {
 		error_skipto(LBRACKET);
 	}
 	<RPARENS> Stmt()
 }
 
-void Expr() : {}
+void Expr() #void : {}
 {
 	ExprAnd()
 }
 
-void ExprAnd() : {}
+void ExprAnd() #void : {}
 {
 	ExprRelation() (<AND> ExprRelation())*
 }
 
-void ExprRelation() : {}
+void ExprRelation() #void : {}
 {
 	ExprAddSub() (<LESSTHAN> ExprAddSub())*
 }
 
-void ExprAddSub() : {}
+void ExprAddSub() #void : {}
 {
 	ExprMulDiv() 
 	(
@@ -231,7 +236,7 @@ void ExprAddSub() : {}
 	)*
 }
 
-void ExprMulDiv() : {}
+void ExprMulDiv() #void : {}
 {
 	ExprUnary() 
 	(
@@ -241,13 +246,13 @@ void ExprMulDiv() : {}
 	)*
 }
 
-void ExprUnary() : {}
+void ExprUnary() #void : {}
 {
 	(<NOT>)*
 	ExprSuffix()
 }
 
-void ExprSuffix() : {}
+void ExprSuffix() #void : {}
 {
 	ExprPrefix()
 	(
@@ -263,17 +268,26 @@ void ExprSuffix() : {}
 	)*
 }
 
-void ExprPrefix() : {}
+void ExprPrefix() #void : {}
 {
-	<INTEGER_LITERAL> |
-	<TRUE> | 
-	<FALSE> | 
-  <IDENTIFIER> | 
-	<THIS> |
-	<LPARENS> Expr() <RPARENS> |
+	<INTEGER_LITERAL>
+	|
+	<TRUE>
+	| 
+	<FALSE>
+	| 
+	<IDENTIFIER>
+	| 
+	<THIS>
+	|
+	<LPARENS> Expr() <RPARENS> 
+	|
 	LOOKAHEAD(2)
-	<NEW> <TYPE_INT> <LSQPARENS> (Expr())? <RSQPARENS> |
-	<NEW> <IDENTIFIER> <LPARENS> <RPARENS>
+	<NEW> (
+		<TYPE_INT> <LSQPARENS> (Expr())? <RSQPARENS> 
+		|
+		<IDENTIFIER> <LPARENS> <RPARENS>
+	)
 }
 
 /*
