@@ -24,7 +24,6 @@ ifeq ($(IN), 4)
 	IN = $(INPUT4)
 endif
 
-
 all: $(PROG)
 
 $(PROG): 
@@ -36,5 +35,5 @@ $(PROG):
 
 run:
 	cd src && \
-	java Parser ../$(IN) && \
+	java Parser $(IN) && \
 	cd ..
