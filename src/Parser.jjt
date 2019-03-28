@@ -204,24 +204,26 @@ void ExprAnd() : {}
 
 void ExprRelation() : {}
 {
-	ExprAdditive() (<LESSTHAN> ExprAdditive())*
+	ExprAddSub() (<LESSTHAN> ExprAddSub())*
 }
 
-void ExprAdditive() : {}
+void ExprAddSub() : {}
 {
-	ExprMultiplicative() 
+	ExprMulDiv() 
 	(
-		<PLUS> ExprMultiplicative()
+		<PLUS> ExprMulDiv()
 		|
-		<MINUS> ExprMultiplicative()
+		<MINUS> ExprMulDiv()
 	)*
 }
 
-void ExprMultiplicative() : {}
+void ExprMulDiv() : {}
 {
 	ExprUnary() 
 	(
 		<TIMES> ExprUnary()
+		|
+		<DIVIDES> ExprUnary()
 	)*
 }
 
