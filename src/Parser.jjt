@@ -78,7 +78,7 @@ TOKEN :
 	< RSQPARENS : "]" >  |
 	< LBRACKET : "{" > |
 	< RBRACKET : "}" > |
-	< EQUALS : "=" > 
+	< ASSIGN : "=" > 
 }
 
 /* Types */
@@ -126,10 +126,7 @@ void ClassDecl() : {}
 {
 	<CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? <LBRACKET>
 		(VarDecl())*
-		(
-			<PUBLIC>
-			(MainDecl() | MethodDecl())
-		)*
+		(<PUBLIC> (MainDecl() | MethodDecl()))*
 	<RBRACKET>
 }
 
@@ -137,7 +134,7 @@ void MainDecl() : {}
 {
 	<STATIC> <VOID> <MAIN>
 	<LPARENS> <TYPE_STRING> <LSQPARENS> <RSQPARENS> <IDENTIFIER> <RPARENS> <LBRACKET>
-		(VarDecl())*
+		(LOOKAHEAD(2) VarDecl())*
 		(Stmt())*
 	<RBRACKET>
 }
@@ -147,17 +144,20 @@ void MethodDecl() : {}
 	Type() <IDENTIFIER> 
 	<LPARENS> (Type() <IDENTIFIER> (<COMMA> Type() <IDENTIFIER>)*)? <RPARENS>
 	<LBRACKET>
-		(VarDecl())*
+		(LOOKAHEAD(2) VarDecl())*
 		(Stmt())*
 		<RETURN> (Expr())? <SEMICOLON>
 	<RBRACKET>
 }
 
-void Type() #void : {} 
+void Type() : {} 
 {
+	LOOKAHEAD(2)
+	<TYPE_INT>  (<LSQPARENS> <RSQPARENS>)?
+	|
 	<TYPE_BOOLEAN> 
 	|
-	<TYPE_INT>  (<LSQPARENS> <RSQPARENS>)?
+	<IDENTIFIER>
 }
 
 void VarDecl() : {}
@@ -167,13 +167,27 @@ void VarDecl() : {}
 
 void Stmt() : {}
 {
-	<LBRACKET> (Stmt())* <RBRACKET>
+	Block()
+	|
+	LOOKAHEAD(2)
+	AssignStmt()
+	|
+	LOOKAHEAD(2)
+	Expr() <SEMICOLON>
 	|
 	IfStmt()
 	|
 	WhileStmt()
-	|
-	(LOOKAHEAD(2) <IDENTIFIER> (<LSQPARENS> Expr() <RSQPARENS>)? <EQUALS>)? Expr() <SEMICOLON>
+}
+
+void Block() : {}
+{
+	<LBRACKET> (Stmt())* <RBRACKET>
+}
+
+void AssignStmt() : {}
+{
+	<IDENTIFIER> (<LSQPARENS> Expr() <RSQPARENS>)? <ASSIGN> Expr() <SEMICOLON>
 }
 
 void IfStmt() : {}
@@ -192,7 +206,7 @@ void WhileStmt() : {}
 	<RPARENS> Stmt()
 }
 
-void Expr() #MyExpr : {}
+void Expr() : {}
 {
 	ExprAnd()
 }
