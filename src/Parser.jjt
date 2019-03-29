@@ -117,12 +117,12 @@ TOKEN :
  * Grammar definition
  */
 
-SimpleNode Program() : {}
+SimpleNode Program() #Start : {}
 {
 	ClassDecl() <EOF> { return jjtThis; }
 }
 
-void ClassDecl() #Class : {} 
+void ClassDecl() #Class : {Token t;} 
 {
 	<CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? <LBRACKET>
 		(VarDecl())*
@@ -139,9 +139,9 @@ void MainDecl() #Main : {}
 	<RBRACKET>
 }
 
-void MethodDecl() #Method : {}
+void MethodDecl() #Method : {Token t;}
 {
-	Type() <IDENTIFIER> #MethodName
+	Type() t=<IDENTIFIER> {jjtThis.val = t.image;}
 	<LPARENS> (Type() <IDENTIFIER> (<COMMA> Type() <IDENTIFIER>)*)? <RPARENS>
 	<LBRACKET>
 		(LOOKAHEAD(2) VarDecl())*
@@ -153,16 +153,16 @@ void MethodDecl() #Method : {}
 void Type() #void : {} 
 {
 	LOOKAHEAD(2)
-	<TYPE_INT>  (<LSQPARENS> <RSQPARENS>)?
+	<TYPE_INT> (<LSQPARENS> <RSQPARENS>)?
 	|
 	<TYPE_BOOLEAN> 
 	|
 	<IDENTIFIER>
 }
 
-void VarDecl() #VariableDeclaration : {}
+void VarDecl() #Variable : {Token t;}
 {
-	Type() <IDENTIFIER> #VariableName <SEMICOLON>
+	Type() t=<IDENTIFIER> {jjtThis.val = t.image;} <SEMICOLON>
 }
 
 void Stmt() #void : {}
@@ -185,9 +185,12 @@ void Block() #void : {}
 	<LBRACKET> (Stmt())* <RBRACKET>
 }
 
-void AssignStmt() : {}
+void AssignStmt() #Assign : {Token t;}
 {
-	<IDENTIFIER> (<LSQPARENS> Expr() <RSQPARENS>)? #Lhs <ASSIGN> Expr() #Rhs <SEMICOLON>
+	t=<IDENTIFIER> (<LSQPARENS> Expr() <RSQPARENS>)? {jjtThis.val = t.image;} #Lhs 
+	<ASSIGN> 
+	Expr() #Rhs 
+	<SEMICOLON>
 }
 
 void ExprStmt() : {}
@@ -195,14 +198,14 @@ void ExprStmt() : {}
 	Expr() <SEMICOLON>
 }
 
-void IfStmt() : {}
+void IfStmt() #If : {}
 {
-	<IF> <LPARENS> Expr() #IfCondition <RPARENS> Stmt() <ELSE> Stmt()
+	<IF> <LPARENS> Expr() #IfCondition <RPARENS> Stmt() <ELSE> Stmt() #Else
 }
 
-void WhileStmt() : {}
+void WhileStmt() #While : {}
 {
-	<WHILE> <LPARENS> 
+	<WHILE> <LPARENS>
 	try {
 		Expr() #WhileCondition 
 	} catch (ParseException e) {
@@ -218,31 +221,38 @@ void Expr() #void : {}
 
 void ExprAnd() #void : {}
 {
-	ExprRelation() (<AND> ExprRelation())*
+	ExprRelation()
+	(
+		<AND>
+		ExprRelation()
+	)*
 }
 
-void ExprRelation() #void : {}
+void ExprRelation() #void : {Token t;}
 {
-	ExprAddSub() (<LESSTHAN> ExprAddSub())*
+	ExprAddSub() 
+	(
+		<LESSTHAN> ExprAddSub() #LessThan 
+	)*
 }
 
 void ExprAddSub() #void : {}
 {
 	ExprMulDiv() 
 	(
-		<PLUS> ExprMulDiv()
+		<PLUS> ExprMulDiv() #Add
 		|
-		<MINUS> ExprMulDiv()
+		<MINUS> ExprMulDiv() #Sub
 	)*
 }
 
 void ExprMulDiv() #void : {}
 {
-	ExprUnary() 
+	ExprUnary()
 	(
-		<TIMES> ExprUnary()
+		<TIMES> ExprUnary() #Mul
 		|
-		<DIVIDES> ExprUnary()
+		<DIVIDES> ExprUnary() #Div
 	)*
 }
 
@@ -252,7 +262,7 @@ void ExprUnary() #void : {}
 	ExprSuffix()
 }
 
-void ExprSuffix() #void : {}
+void ExprSuffix() #void : {Token t;}
 {
 	ExprPrefix()
 	(
@@ -263,30 +273,31 @@ void ExprSuffix() #void : {}
 		(
 		<LENGTH>
 		|
-		<IDENTIFIER> <LPARENS> (Expr() (<COMMA> Expr())* )? <RPARENS>
+		t=<IDENTIFIER> {jjtThis.val = t.image;} #MethodCall 
+		<LPARENS> (Expr() (<COMMA> Expr())* )? <RPARENS>
 		)	
 	)*
 }
 
-void ExprPrefix() #void : {}
+void ExprPrefix() #void : {Token t;}
 {
-	<INTEGER_LITERAL>
+	t=<INTEGER_LITERAL> {jjtThis.val = t.image;} #Term
 	|
-	<TRUE>
+	t=<TRUE> {jjtThis.val = t.image;} #Term
 	| 
-	<FALSE>
+	t=<FALSE> {jjtThis.val = t.image;} #Term
 	| 
-	<IDENTIFIER>
+	t=<IDENTIFIER> {jjtThis.val = t.image;} #Term
 	| 
-	<THIS>
+	t=<THIS> {jjtThis.val = t.image;} #Term
 	|
 	<LPARENS> Expr() <RPARENS> 
 	|
 	LOOKAHEAD(2)
 	<NEW> (
-		<TYPE_INT> <LSQPARENS> (Expr())? <RSQPARENS> 
+		t=<TYPE_INT> {jjtThis.val = t.image;} #New <LSQPARENS> (Expr())? <RSQPARENS> 
 		|
-		<IDENTIFIER> <LPARENS> <RPARENS>
+		t=<IDENTIFIER> {jjtThis.val = t.image;} #New <LPARENS> <RPARENS>
 	)
 }
 
