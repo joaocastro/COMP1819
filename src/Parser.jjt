@@ -124,10 +124,18 @@ SimpleNode Program() #Start : {}
 
 void ClassDecl() #Class : {Token t;} 
 {
-	<CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? <LBRACKET>
+	<CLASS> t=<IDENTIFIER> {jjtThis.val = t.image;} #Name ClassExtends()
+	<LBRACKET>
 		(VarDecl())*
 		(<PUBLIC> (MainDecl() | MethodDecl()))*
 	<RBRACKET>
+}
+
+void ClassExtends() #void : {Token t;}
+{
+	(
+		<EXTENDS> t=<IDENTIFIER> {jjtThis.val = t.image;} #Extends
+	)?
 }
 
 void MainDecl() #Main : {}
@@ -141,8 +149,8 @@ void MainDecl() #Main : {}
 
 void MethodDecl() #Method : {Token t;}
 {
-	Type() t=<IDENTIFIER> {jjtThis.val = t.image;}
-	<LPARENS> (Type() <IDENTIFIER> (<COMMA> Type() <IDENTIFIER>)*)? <RPARENS>
+	Type() #Return t=<IDENTIFIER> {jjtThis.val = t.image;} #Name
+	<LPARENS> Params() <RPARENS>
 	<LBRACKET>
 		(LOOKAHEAD(2) VarDecl())*
 		(Stmt())*
@@ -150,14 +158,25 @@ void MethodDecl() #Method : {Token t;}
 	<RBRACKET>
 }
 
-void Type() #void : {} 
+void Params() #void : {}
+{
+	(Param() (<COMMA> Param())*)?
+}
+
+void Param() : {Token t;}
+{
+	Type() t=<IDENTIFIER> {jjtThis.val = t.image;} #Name
+}
+
+
+void Type() : {Token t;} 
 {
 	LOOKAHEAD(2)
-	<TYPE_INT> (<LSQPARENS> <RSQPARENS>)?
+	t=<TYPE_INT> {jjtThis.val = t.image;} (<LSQPARENS> <RSQPARENS>)?
 	|
-	<TYPE_BOOLEAN> 
+	t=<TYPE_BOOLEAN> {jjtThis.val = t.image;}
 	|
-	<IDENTIFIER>
+	t=<IDENTIFIER> {jjtThis.val = t.image;}
 }
 
 void VarDecl() #Variable : {Token t;}
@@ -187,11 +206,23 @@ void Block() #void : {}
 
 void AssignStmt() #Assign : {Token t;}
 {
-	t=<IDENTIFIER> (<LSQPARENS> Expr() <RSQPARENS>)? {jjtThis.val = t.image;} #Lhs 
-	<ASSIGN> 
-	Expr() #Rhs 
-	<SEMICOLON>
+	Lhs() <ASSIGN> Rhs() <SEMICOLON>
 }
+
+void Lhs() : {Token t;}
+{
+	t=<IDENTIFIER> {jjtThis.val = t.image;} #Name ArrayAcc()
+}
+
+void Rhs() : {}
+{
+	Expr()
+}
+
+void ArrayAcc() #void : {}
+{
+	(<LSQPARENS> Expr() #ArrayAcc <RSQPARENS>)?
+} 
 
 void ExprStmt() : {}
 {
