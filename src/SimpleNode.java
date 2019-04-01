@@ -58,7 +58,10 @@ class SimpleNode implements Node {
      you need to do. */
 
   public String toString() {
-    return ParserTreeConstants.jjtNodeName[id];
+    if (this.val == null)
+      return ParserTreeConstants.jjtNodeName[id];
+    else
+      return ParserTreeConstants.jjtNodeName[id] + " " + this.val;
   }
   public String toString(String prefix) { return prefix + toString(); }
 
@@ -68,14 +71,14 @@ class SimpleNode implements Node {
   public void dump(String prefix) {
     System.out.println(toString(prefix));
 
-    if (children == null) // leaf node
-      System.out.println("\t" + this.val);
+    // if (children == null) // leaf node
+    //   System.out.println("\t" + this.val);
 
     if (children != null) {
       for (int i = 0; i < children.length; ++i) {
         SimpleNode n = (SimpleNode)children[i];
         if (n != null) {
-          n.dump(prefix + " ");
+          n.dump(prefix + "\t");
         }
       }
     }

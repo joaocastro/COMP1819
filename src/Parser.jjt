@@ -158,21 +158,21 @@ void MethodDecl() #Method : {Token t;}
 	<RBRACKET>
 }
 
-void Params() #void : {}
+void Params() : {}
 {
 	(Param() (<COMMA> Param())*)?
 }
 
 void Param() : {Token t;}
 {
-	Type() t=<IDENTIFIER> {jjtThis.val = t.image;} #Name
+	Type() t=<IDENTIFIER> {jjtThis.val = t.image;}
 }
 
 
 void Type() : {Token t;} 
 {
 	LOOKAHEAD(2)
-	t=<TYPE_INT> {jjtThis.val = t.image;} (<LSQPARENS> <RSQPARENS>)?
+	t=<TYPE_INT> {jjtThis.val = t.image;} (<LSQPARENS> <RSQPARENS> {jjtThis.val += "[]";})?
 	|
 	t=<TYPE_BOOLEAN> {jjtThis.val = t.image;}
 	|
@@ -211,17 +211,17 @@ void AssignStmt() #Assign : {Token t;}
 
 void Lhs() : {Token t;}
 {
-	t=<IDENTIFIER> {jjtThis.val = t.image;} #Name ArrayAcc()
+	t=<IDENTIFIER> {jjtThis.val = t.image;} ArrayAcc()
 }
 
-void Rhs() : {}
+void Rhs() : {Token t;}
 {
 	Expr()
 }
 
 void ArrayAcc() #void : {}
 {
-	(<LSQPARENS> Expr() #ArrayAcc <RSQPARENS>)?
+	(<LSQPARENS> Expr() <RSQPARENS>)?
 } 
 
 void ExprStmt() : {}
@@ -254,8 +254,7 @@ void ExprAnd() #void : {}
 {
 	ExprRelation()
 	(
-		<AND>
-		ExprRelation()
+		<AND> ExprRelation() #And(2)
 	)*
 }
 
@@ -263,7 +262,7 @@ void ExprRelation() #void : {Token t;}
 {
 	ExprAddSub() 
 	(
-		<LESSTHAN> ExprAddSub() #LessThan 
+		<LESSTHAN> ExprAddSub() #LessThan(2)
 	)*
 }
 
@@ -271,9 +270,9 @@ void ExprAddSub() #void : {}
 {
 	ExprMulDiv() 
 	(
-		<PLUS> ExprMulDiv() #Add
+		<PLUS> ExprMulDiv() #Add(2)
 		|
-		<MINUS> ExprMulDiv() #Sub
+		<MINUS> ExprMulDiv() #Sub(2)
 	)*
 }
 
@@ -281,9 +280,9 @@ void ExprMulDiv() #void : {}
 {
 	ExprUnary()
 	(
-		<TIMES> ExprUnary() #Mul
+		<TIMES> ExprUnary() #Mul(2)
 		|
-		<DIVIDES> ExprUnary() #Div
+		<DIVIDES> ExprUnary() #Div(2)
 	)*
 }
 
@@ -299,15 +298,19 @@ void ExprSuffix() #void : {Token t;}
 	(
 		<LSQPARENS> Expr() <RSQPARENS>
 		|
-		LOOKAHEAD(2)
-		<DOT> 
-		(
-		<LENGTH>
-		|
-		t=<IDENTIFIER> {jjtThis.val = t.image;} #MethodCall 
-		<LPARENS> (Expr() (<COMMA> Expr())* )? <RPARENS>
-		)	
+		MethodCall()
 	)*
+}
+
+void MethodCall() : {Token t;}
+{
+	<DOT> 
+	(
+	t=<LENGTH> {jjtThis.val = t.image;}
+	|
+	t=<IDENTIFIER> {jjtThis.val = t.image;}
+	<LPARENS> (Expr() (<COMMA> Expr())* )? <RPARENS>
+	)
 }
 
 void ExprPrefix() #void : {Token t;}
@@ -339,8 +342,9 @@ void ExprPrefix() #void : {Token t;}
 JAVACODE
 void error_skipto(int kind) {
   ParseException e = generateParseException();  // generate the exception object.
-  System.out.println(e.toString());  // print the error message
-  Token t;
+	System.out.println(e.toString());  // print the error message
+	
+	Token t;
   do {
     t = getNextToken();
   } while (t.kind != kind);
