@@ -6,6 +6,7 @@
 
 options {
 	LOOKAHEAD=1;
+	MULTI=true;
 }
 
 PARSER_BEGIN(Parser)
@@ -315,15 +316,15 @@ void MethodCall() : {Token t;}
 
 void ExprPrefix() #void : {Token t;}
 {
-	t=<INTEGER_LITERAL> {jjtThis.val = t.image;} #Term
+	t=<INTEGER_LITERAL> {jjtThis.val = t.image;} #Integer
 	|
-	t=<TRUE> {jjtThis.val = t.image;} #Term
+	t=<TRUE> {jjtThis.val = t.image;} #True
 	| 
-	t=<FALSE> {jjtThis.val = t.image;} #Term
+	t=<FALSE> {jjtThis.val = t.image;} #False
 	| 
-	t=<IDENTIFIER> {jjtThis.val = t.image;} #Term
+	t=<IDENTIFIER> {jjtThis.val = t.image;} #Id
 	| 
-	t=<THIS> {jjtThis.val = t.image;} #Term
+	t=<THIS> {jjtThis.val = t.image;} #This
 	|
 	<LPARENS> Expr() <RPARENS> 
 	|
