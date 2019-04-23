@@ -1,6 +1,2 @@
-src/*.java
-src/*.class
-
-!src/SimpleNode.java
-
-src/Parser.jj
+# Generated class files
+*.class

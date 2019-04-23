@@ -4,15 +4,17 @@ A compiler of Java-- ([MiniJava][minijava]) programs to Java bytecode.
 
 ## Usage
 
-In the `src/` directory, generate the parser (with [JavaCC][javacc] and [JJTree][jjtree]) with
+In the `src/` directory, generate the compiler (with [JavaCC][javacc] and [JJTree][jjtree]) with
 ```
 jjtree Parser.jjt
+cd AST/
 javacc Parser.jj
+cd ..
 javac *.java
 ```
-To run the parser through a Java-- file, use
+To compile a Java-- file, use
 ```
-java Parser <jmm file>
+java jmm <jmm file>
 ```
 
 ### With `make` 
