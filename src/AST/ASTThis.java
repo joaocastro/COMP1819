@@ -12,5 +12,8 @@ class ASTThis extends SimpleNode {
     super(p, id);
   }
 
+  public String toString() {
+    return "this";
+  }
 }
 /* JavaCC - OriginalChecksum=f94674447270b7618dffce66f268cc2e (do not edit this line) */

@@ -12,5 +12,8 @@ class ASTParam extends SimpleNode {
     super(p, id);
   }
 
+  public void dump(String prefix) {
+    System.out.println(toString(prefix) + " " + children[0].toString());
+  }
 }
 /* JavaCC - OriginalChecksum=46c3142ce25c1eaf705d9ab2fe382707 (do not edit this line) */

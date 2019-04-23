@@ -12,5 +12,8 @@ class ASTAdd extends SimpleNode {
     super(p, id);
   }
 
+  public String toString() {
+    return "+";
+  }
 }
 /* JavaCC - OriginalChecksum=4699da1c96515c12ab9e2596a5731720 (do not edit this line) */

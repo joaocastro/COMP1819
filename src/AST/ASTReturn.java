@@ -12,5 +12,8 @@ class ASTReturn extends SimpleNode {
     super(p, id);
   }
 
+  public void dump(String prefix) {
+    System.out.println(toString(prefix) + " " + children[0].toString());
+  }
 }
 /* JavaCC - OriginalChecksum=8a561855f273d959c6fd11b5e9925e8b (do not edit this line) */

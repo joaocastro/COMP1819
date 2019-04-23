@@ -11,6 +11,9 @@ class ASTVariable extends SimpleNode {
   public ASTVariable(Parser p, int id) {
     super(p, id);
   }
-
+  
+  public void dump(String prefix) {
+    System.out.println(toString(prefix) + " " + children[0].toString());
+  }
 }
 /* JavaCC - OriginalChecksum=9adb520c109ebbd9499d35e742d56a0a (do not edit this line) */

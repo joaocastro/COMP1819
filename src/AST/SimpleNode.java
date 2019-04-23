@@ -66,7 +66,7 @@ protected Node parent;
       return ParserTreeConstants.jjtNodeName[id] + " " + this.val;
   }
   public String toString(String prefix) { return prefix + toString(); }
-
+  
   /* Override this method if you want to customize how the node dumps
      out its children. */
 

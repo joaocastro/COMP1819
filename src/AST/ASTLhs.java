@@ -12,5 +12,16 @@ class ASTLhs extends SimpleNode {
     super(p, id);
   }
 
+  public String toString() {
+    if (children == null)
+      return super.toString();
+
+    return super.toString() + "[" + children[0].toString() + "]";
+  }
+
+  public void dump(String prefix) {
+    System.out.println(toString(prefix));
+  }
+
 }
 /* JavaCC - OriginalChecksum=8b51936d91e24045e30afbdc0881ea7d (do not edit this line) */

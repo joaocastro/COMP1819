@@ -12,5 +12,8 @@ class ASTDiv extends SimpleNode {
     super(p, id);
   }
 
+  public String toString() {
+    return "/";
+  }
 }
 /* JavaCC - OriginalChecksum=0481b5adc25ef6764b8a948abd79c44a (do not edit this line) */

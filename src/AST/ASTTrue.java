@@ -12,5 +12,9 @@ class ASTTrue extends SimpleNode {
     super(p, id);
   }
 
+  public String toString() {
+    return "true";
+  }
+
 }
 /* JavaCC - OriginalChecksum=39e9f890c156bbfe32bac28dee013952 (do not edit this line) */

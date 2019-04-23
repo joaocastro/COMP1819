@@ -12,5 +12,8 @@ class ASTMul extends SimpleNode {
     super(p, id);
   }
 
+  public String toString() {
+    return "*";
+  }
 }
 /* JavaCC - OriginalChecksum=63ef49b2b4cced76f16ea088d24f6aec (do not edit this line) */
