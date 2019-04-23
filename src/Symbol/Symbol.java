@@ -3,17 +3,16 @@ package Symbol;
 public class Symbol {
     private String name = null;
     private String type;
-    private int register;
     private boolean init = false;
 
     public Symbol(String name, String type) {
         this.name = name;
-        this.type = type; //"array" or "int"
+        this.type = type;
     }
 
     public Symbol(String name, String type, boolean init) {
         this.name = name;
-        this.type = type; //"array" or "int"
+        this.type = type;
         this.init = init;
     }
 
@@ -25,16 +24,8 @@ public class Symbol {
         return this.type;
     }
 
-    public int getRegister() {
-        return this.register;
-    }
-
     public boolean getInit() {
         return this.init;
-    }
-
-    public void setRegister(int register) {
-        this.register = register;
     }
 
     public void setInit(){

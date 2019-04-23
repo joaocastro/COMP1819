@@ -1,5 +1,5 @@
 /*
- * jmm.jjt
+ * jmmc.java
  *
  * A Java-- (MiniJava) compiler.
  */
@@ -11,10 +11,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.List;
 
-public class jmm {
+public class jmmc {
   private HashMap<String, SymbolTable> symbol_tables =
       new HashMap<String, SymbolTable>();
 
@@ -28,7 +28,7 @@ public class jmm {
 
     try {
       InputStream parserStream =
-        (args.length == 0) ? System.in : readInputFile(args[0]);
+        (args.length == 0) ? System.in : read_input_file(args[0]);
 
       parser = new Parser(parserStream);
     } catch (FileNotFoundException e) {
@@ -36,10 +36,10 @@ public class jmm {
       return;
     }
 
-    new jmm(parser);
+    new jmmc(parser);
   }
 
-  public jmm(Parser parser) {
+  public jmmc(Parser parser) {
     try {
       // Begin parsing
       SimpleNode root = parser.Program();
@@ -50,12 +50,12 @@ public class jmm {
       System.out.println("Error parsing.");
       System.out.println(e.getMessage());
     } catch (TokenMgrError e) {
-      System.out.println("Error parsing.");
+      System.out.println("Error.");
       System.out.println(e.getMessage());
     }
   }
 
-  public static InputStream readInputFile(String inputFile) throws IOException {
+  public static InputStream read_input_file(String inputFile) throws IOException {
     File initialFile = new File(inputFile);
     InputStream targetStream = new FileInputStream(initialFile);
     return targetStream;
