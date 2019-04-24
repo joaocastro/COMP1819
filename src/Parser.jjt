@@ -8,6 +8,7 @@ options {
 	LOOKAHEAD=1;
 	MULTI=true;
 	JJTREE_OUTPUT_DIRECTORY = "AST";
+	
 }
 
 PARSER_BEGIN(Parser)
@@ -298,25 +299,27 @@ void ExprUnary() #void : {}
 	ExprSuffix()
 }
 
-void ExprSuffix() #void : {Token t;}
+void ExprSuffix() #ExprSuffix(> 1) : {Token t;}
 {
 	ExprPrefix()
 	(
 		<LSQPARENS> Expr() <RSQPARENS>
 		|
-		MethodCall()
+		jjtThis.val=MethodCall()
+		{jjtThis.kind = "MethodCall";}
 	)*
 }
 
-void MethodCall() : {Token t;}
+String MethodCall() #void : {String token_img; Token t;}
 {
 	<DOT> 
 	(
-	t=<LENGTH> {jjtThis.val = t.image;}
+	t=<LENGTH> {token_img =t.image;}
 	|
-	t=<IDENTIFIER> {jjtThis.val = t.image;}
+	t=<IDENTIFIER> {token_img = t.image;} 
 	<LPARENS> MethodCallArgs() <RPARENS>
 	)
+	{return token_img;}
 }
 
 void MethodCallArgs() : {} 

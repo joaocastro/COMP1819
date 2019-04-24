@@ -24,19 +24,17 @@ public class jmmc {
   private int error_count = 0;
 
   public static void main(String args[]) throws ParseException, IOException {
-    Parser parser;
-
     try {
       InputStream parserStream =
         (args.length == 0) ? System.in : read_input_file(args[0]);
 
-      parser = new Parser(parserStream);
+      Parser parser = new Parser(parserStream);
+      
+      new jmmc(parser);
     } catch (FileNotFoundException e) {
       System.out.println("File does not exist.");
       return;
     }
-
-    new jmmc(parser);
   }
 
   public jmmc(Parser parser) {

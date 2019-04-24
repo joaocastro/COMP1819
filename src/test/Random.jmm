@@ -6,6 +6,10 @@ class Fac {
 
 		a = new int[/* */];
 
+		a = 1 * 2 * 3;
+		a = 1 * (2 + 3);
+		a = 1 + 2 + 3;
+
 		if (num < 1)
 			num_aux = 1;
 		else

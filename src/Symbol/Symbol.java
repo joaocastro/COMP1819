@@ -28,12 +28,8 @@ public class Symbol {
         return this.init;
     }
 
-    public void setInit(){
-        this.init = true;
-    }
-
-    public void setNotInit(){
-        this.init = false;
+    public void setInit(boolean val){
+        this.init = val;
     }
 
     public boolean equals(Object symbol) {

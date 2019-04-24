@@ -9,17 +9,17 @@ public class ASTRhs extends SimpleNode {
   public ASTRhs(Parser p, int id) { super(p, id); }
 
   public String toString() {
-    if (children.length == 1)
-      return super.toString() + " " + children[0].toString();
+    /* if (children.length == 1)
+      return super.toString() + " " + children[0].toString(); */
 
     return super.toString();
   }
 
   public void dump(String prefix) {
-    if (children.length == 1) {
+    /* if (children.length == 1) {
       System.out.println(toString(prefix));
       return;
-    }
+    } */
 
     super.dump(prefix);
   }

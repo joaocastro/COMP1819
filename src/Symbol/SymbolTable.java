@@ -6,6 +6,9 @@ import java.util.Map;
 public class SymbolTable implements Cloneable {
   private LinkedHashMap<String, Symbol> params;
   private LinkedHashMap<String, Symbol> locals;
+  private LinkedHashMap<String, SymbolTable> children;
+  private SymbolTable parent;
+  
   private Symbol returnSymbol = null;
   private boolean returned = false;
 

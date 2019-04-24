@@ -29,7 +29,7 @@ public interface ParserTreeConstants
   public int JJTSUB = 23;
   public int JJTMUL = 24;
   public int JJTDIV = 25;
-  public int JJTMETHODCALL = 26;
+  public int JJTEXPRSUFFIX = 26;
   public int JJTMETHODCALLARGS = 27;
   public int JJTINTEGER = 28;
   public int JJTTRUE = 29;
@@ -66,7 +66,7 @@ public interface ParserTreeConstants
     "Sub",
     "Mul",
     "Div",
-    "MethodCall",
+    "ExprSuffix",
     "MethodCallArgs",
     "Integer",
     "True",
@@ -76,4 +76,4 @@ public interface ParserTreeConstants
     "New",
   };
 }
-/* JavaCC - OriginalChecksum=683478b31af484be9ca0d52f9be9f831 (do not edit this line) */
+/* JavaCC - OriginalChecksum=fb9fa85b42a91a96b3b07917ca7079e7 (do not edit this line) */

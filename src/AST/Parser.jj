@@ -970,36 +970,21 @@ void ExprUnary()       : {}
 	ExprSuffix()
 }
 
-void ExprSuffix()       : {Token t;}
-{
+void ExprSuffix()                  : {/*@bgen(jjtree) #ExprSuffix(> 1) */
+                                      ASTExprSuffix jjtn000 = new ASTExprSuffix(JJTEXPRSUFFIX);
+                                      boolean jjtc000 = true;
+                                      jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t;}
+{/*@bgen(jjtree) #ExprSuffix(> 1) */
+        try {
+/*@egen*/
 	ExprPrefix()
 	(
 		<LSQPARENS> Expr() <RSQPARENS>
 		|
-		MethodCall()
-	)*
-}
-
-void MethodCall() : {/*@bgen(jjtree) MethodCall */
-                     ASTMethodCall jjtn000 = new ASTMethodCall(JJTMETHODCALL);
-                     boolean jjtc000 = true;
-                     jjtree.openNodeScope(jjtn000);
-/*@egen*/Token t;}
-{/*@bgen(jjtree) MethodCall */
-        try {
-/*@egen*/
-	<DOT> 
-	(
-	t=<LENGTH>/*@bgen(jjtree)*/
-                   {
-                     jjtree.closeNodeScope(jjtn000, true);
-                     jjtc000 = false;
-                   }
-/*@egen*/ {jjtn000.val = t.image;}
-	|
-	t=<IDENTIFIER> {jjtn000.val = t.image;}
-	<LPARENS> MethodCallArgs() <RPARENS>
-	)/*@bgen(jjtree)*/
+		jjtn000.val=MethodCall()
+		{jjtn000.kind = "MethodCall";}
+	)*/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1016,10 +1001,22 @@ void MethodCall() : {/*@bgen(jjtree) MethodCall */
           throw (Error)jjte000;
         } finally {
           if (jjtc000) {
-            jjtree.closeNodeScope(jjtn000, true);
+            jjtree.closeNodeScope(jjtn000, jjtree.nodeArity() > 1);
           }
         }
 /*@egen*/
+}
+
+String MethodCall()       : {String token_img; Token t;}
+{
+	<DOT> 
+	(
+	t=<LENGTH> {token_img =t.image;}
+	|
+	t=<IDENTIFIER> {token_img = t.image;} 
+	<LPARENS> MethodCallArgs() <RPARENS>
+	)
+	{return token_img;}
 }
 
 void MethodCallArgs() : {/*@bgen(jjtree) MethodCallArgs */

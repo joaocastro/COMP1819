@@ -1081,65 +1081,41 @@ if (jjtc002) {
     ExprSuffix();
   }
 
-  static final public void ExprSuffix() throws ParseException {Token t;
-    ExprPrefix();
-    label_14:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case DOT:
-      case LSQPARENS:{
-        ;
-        break;
-        }
-      default:
-        jj_la1[22] = jj_gen;
-        break label_14;
-      }
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case LSQPARENS:{
-        jj_consume_token(LSQPARENS);
-        Expr();
-        jj_consume_token(RSQPARENS);
-        break;
-        }
-      case DOT:{
-        MethodCall();
-        break;
-        }
-      default:
-        jj_la1[23] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-    }
-  }
-
-  static final public void MethodCall() throws ParseException {/*@bgen(jjtree) MethodCall */
-                     ASTMethodCall jjtn000 = new ASTMethodCall(JJTMETHODCALL);
-                     boolean jjtc000 = true;
-                     jjtree.openNodeScope(jjtn000);Token t;
+  static final public void ExprSuffix() throws ParseException {/*@bgen(jjtree) #ExprSuffix(> 1) */
+                                      ASTExprSuffix jjtn000 = new ASTExprSuffix(JJTEXPRSUFFIX);
+                                      boolean jjtc000 = true;
+                                      jjtree.openNodeScope(jjtn000);Token t;
     try {
-      jj_consume_token(DOT);
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case LENGTH:{
-        t = jj_consume_token(LENGTH);
-jjtree.closeNodeScope(jjtn000, true);
-                     jjtc000 = false;
-jjtn000.val = t.image;
-        break;
+      ExprPrefix();
+      label_14:
+      while (true) {
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case DOT:
+        case LSQPARENS:{
+          ;
+          break;
+          }
+        default:
+          jj_la1[22] = jj_gen;
+          break label_14;
         }
-      case IDENTIFIER:{
-        t = jj_consume_token(IDENTIFIER);
-jjtn000.val = t.image;
-        jj_consume_token(LPARENS);
-        MethodCallArgs();
-        jj_consume_token(RPARENS);
-        break;
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case LSQPARENS:{
+          jj_consume_token(LSQPARENS);
+          Expr();
+          jj_consume_token(RSQPARENS);
+          break;
+          }
+        case DOT:{
+          jjtn000.val = MethodCall();
+jjtn000.kind = "MethodCall";
+          break;
+          }
+        default:
+          jj_la1[23] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
         }
-      default:
-        jj_la1[24] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
       }
     } catch (Throwable jjte000) {
 if (jjtc000) {
@@ -1157,9 +1133,34 @@ if (jjtc000) {
           {if (true) throw (Error)jjte000;}
     } finally {
 if (jjtc000) {
-            jjtree.closeNodeScope(jjtn000, true);
+            jjtree.closeNodeScope(jjtn000, jjtree.nodeArity() > 1);
           }
     }
+  }
+
+  static final public String MethodCall() throws ParseException {String token_img; Token t;
+    jj_consume_token(DOT);
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case LENGTH:{
+      t = jj_consume_token(LENGTH);
+token_img =t.image;
+      break;
+      }
+    case IDENTIFIER:{
+      t = jj_consume_token(IDENTIFIER);
+token_img = t.image;
+      jj_consume_token(LPARENS);
+      MethodCallArgs();
+      jj_consume_token(RPARENS);
+      break;
+      }
+    default:
+      jj_la1[24] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+{if ("" != null) return token_img;}
+    throw new Error("Missing return statement in function");
   }
 
   static final public void MethodCallArgs() throws ParseException {/*@bgen(jjtree) MethodCallArgs */
@@ -1486,15 +1487,15 @@ if (jjtc007) {
     return false;
   }
 
-  static private boolean jj_3R_24()
- {
-    if (jj_3R_28()) return true;
-    return false;
-  }
-
   static private boolean jj_3R_20()
  {
     if (jj_scan_token(TYPE_INT)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_24()
+ {
+    if (jj_3R_28()) return true;
     return false;
   }
 
@@ -1547,13 +1548,6 @@ if (jjtc007) {
     return false;
   }
 
-  static private boolean jj_3R_19()
- {
-    if (jj_3R_24()) return true;
-    if (jj_scan_token(SEMICOLON)) return true;
-    return false;
-  }
-
   static private boolean jj_3R_45()
  {
     if (jj_scan_token(INTEGER_LITERAL)) return true;
@@ -1583,6 +1577,13 @@ if (jjtc007) {
     }
     }
     }
+    return false;
+  }
+
+  static private boolean jj_3R_19()
+ {
+    if (jj_3R_24()) return true;
+    if (jj_scan_token(SEMICOLON)) return true;
     return false;
   }
 
