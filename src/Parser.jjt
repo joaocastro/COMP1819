@@ -156,7 +156,7 @@ void MainDecl() #Main : {}
 void MethodDecl() #Method : {Token t;}
 {
 	Type() #Return t=<IDENTIFIER> {jjtThis.val = t.image;} #Name
-	<LPARENS> Params() <RPARENS>
+	<LPARENS> MethodParams() <RPARENS>
 	<LBRACKET>
 		(LOOKAHEAD(2) VarDecl())*
 		(Stmt())*
@@ -164,12 +164,12 @@ void MethodDecl() #Method : {Token t;}
 	<RBRACKET>
 }
 
-void Params() : {}
+void MethodParams() : {}
 {
-	(Param() (<COMMA> Param())*)?
+	(MethodParam() (<COMMA> MethodParam())*)?
 }
 
-void Param() : {Token t;}
+void MethodParam() : {Token t;}
 {
 	Type() t=<IDENTIFIER> {jjtThis.val = t.image;}
 }
@@ -230,7 +230,7 @@ void ArrayAcc() #void : {}
 	(<LSQPARENS> Expr() <RSQPARENS>)?
 } 
 
-void ExprStmt() : {}
+void ExprStmt() #void : {}
 {
 	Expr() <SEMICOLON>
 }
@@ -315,8 +315,13 @@ void MethodCall() : {Token t;}
 	t=<LENGTH> {jjtThis.val = t.image;}
 	|
 	t=<IDENTIFIER> {jjtThis.val = t.image;}
-	<LPARENS> (Expr() (<COMMA> Expr())* )? <RPARENS>
+	<LPARENS> MethodCallArgs() <RPARENS>
 	)
+}
+
+void MethodCallArgs() : {} 
+{
+	(Expr() (<COMMA> Expr())* )?
 }
 
 void ExprPrefix() #void : {Token t;}
@@ -335,7 +340,7 @@ void ExprPrefix() #void : {Token t;}
 	|
 	LOOKAHEAD(2)
 	<NEW> (
-		t=<TYPE_INT> {jjtThis.val = t.image;} #New <LSQPARENS> (Expr())? <RSQPARENS> 
+		t=<TYPE_INT> {jjtThis.val = t.image + "[]";} #New <LSQPARENS> (Expr())? <RSQPARENS> 
 		|
 		t=<IDENTIFIER> {jjtThis.val = t.image;} #New <LPARENS> <RPARENS>
 	)

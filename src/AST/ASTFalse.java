@@ -12,5 +12,10 @@ class ASTFalse extends SimpleNode {
     super(p, id);
   }
 
+
+  public String toString() {
+    return "false";
+  }
+
 }
 /* JavaCC - OriginalChecksum=8bdae87df10a13c1507b5ebb16456431 (do not edit this line) */

@@ -330,7 +330,7 @@ void MethodDecl()         : {/*@bgen(jjtree) Method */
                                         }
                                       }
 /*@egen*/      
-	<LPARENS> Params() <RPARENS>
+	<LPARENS> MethodParams() <RPARENS>
 	<LBRACKET>
 		(LOOKAHEAD(2) VarDecl())*
 		(Stmt())*
@@ -358,15 +358,15 @@ void MethodDecl()         : {/*@bgen(jjtree) Method */
 /*@egen*/
 }
 
-void Params() : {/*@bgen(jjtree) Params */
-  ASTParams jjtn000 = new ASTParams(JJTPARAMS);
+void MethodParams() : {/*@bgen(jjtree) MethodParams */
+  ASTMethodParams jjtn000 = new ASTMethodParams(JJTMETHODPARAMS);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
 /*@egen*/}
-{/*@bgen(jjtree) Params */
+{/*@bgen(jjtree) MethodParams */
         try {
 /*@egen*/
-	(Param() (<COMMA> Param())*)?/*@bgen(jjtree)*/
+	(MethodParam() (<COMMA> MethodParam())*)?/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -389,12 +389,12 @@ void Params() : {/*@bgen(jjtree) Params */
 /*@egen*/
 }
 
-void Param() : {/*@bgen(jjtree) Param */
-                ASTParam jjtn000 = new ASTParam(JJTPARAM);
-                boolean jjtc000 = true;
-                jjtree.openNodeScope(jjtn000);
+void MethodParam() : {/*@bgen(jjtree) MethodParam */
+                      ASTMethodParam jjtn000 = new ASTMethodParam(JJTMETHODPARAM);
+                      boolean jjtc000 = true;
+                      jjtree.openNodeScope(jjtn000);
 /*@egen*/Token t;}
-{/*@bgen(jjtree) Param */
+{/*@bgen(jjtree) MethodParam */
         try {
 /*@egen*/
 	Type() t=<IDENTIFIER>/*@bgen(jjtree)*/
@@ -607,35 +607,9 @@ void ArrayAcc()       : {}
 	(<LSQPARENS> Expr() <RSQPARENS>)?
 } 
 
-void ExprStmt() : {/*@bgen(jjtree) ExprStmt */
-  ASTExprStmt jjtn000 = new ASTExprStmt(JJTEXPRSTMT);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
-{/*@bgen(jjtree) ExprStmt */
-        try {
-/*@egen*/
-	Expr() <SEMICOLON>/*@bgen(jjtree)*/
-        } catch (Throwable jjte000) {
-          if (jjtc000) {
-            jjtree.clearNodeScope(jjtn000);
-            jjtc000 = false;
-          } else {
-            jjtree.popNode();
-          }
-          if (jjte000 instanceof RuntimeException) {
-            throw (RuntimeException)jjte000;
-          }
-          if (jjte000 instanceof ParseException) {
-            throw (ParseException)jjte000;
-          }
-          throw (Error)jjte000;
-        } finally {
-          if (jjtc000) {
-            jjtree.closeNodeScope(jjtn000, true);
-          }
-        }
-/*@egen*/
+void ExprStmt()       : {}
+{
+	Expr() <SEMICOLON>
 }
 
 void IfStmt()     : {/*@bgen(jjtree) If */
@@ -1024,8 +998,39 @@ void MethodCall() : {/*@bgen(jjtree) MethodCall */
 /*@egen*/ {jjtn000.val = t.image;}
 	|
 	t=<IDENTIFIER> {jjtn000.val = t.image;}
-	<LPARENS> (Expr() (<COMMA> Expr())* )? <RPARENS>
+	<LPARENS> MethodCallArgs() <RPARENS>
 	)/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+/*@egen*/
+}
+
+void MethodCallArgs() : {/*@bgen(jjtree) MethodCallArgs */
+  ASTMethodCallArgs jjtn000 = new ASTMethodCallArgs(JJTMETHODCALLARGS);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/} 
+{/*@bgen(jjtree) MethodCallArgs */
+        try {
+/*@egen*/
+	(Expr() (<COMMA> Expr())* )?/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1166,7 +1171,7 @@ void ExprPrefix()       : {Token t;}
                                jjtree.closeNodeScope(jjtn006, true);
                                jjtc006 = false;
                              }
-/*@egen*/ {jjtn006.val = t.image;}/*@bgen(jjtree)*/
+/*@egen*/ {jjtn006.val = t.image + "[]";}/*@bgen(jjtree)*/
                              } finally {
                                if (jjtc006) {
                                  jjtree.closeNodeScope(jjtn006, true);

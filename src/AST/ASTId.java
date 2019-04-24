@@ -12,5 +12,9 @@ class ASTId extends SimpleNode {
     super(p, id);
   }
 
+  public String toString() {
+    return "id" + " " + this.val;
+  }
+
 }
 /* JavaCC - OriginalChecksum=1f7368955bd6aad692b10f39c061f49d (do not edit this line) */

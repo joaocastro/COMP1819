@@ -11,26 +11,26 @@ public interface ParserTreeConstants
   public int JJTMAIN = 5;
   public int JJTMETHOD = 6;
   public int JJTRETURN = 7;
-  public int JJTPARAMS = 8;
-  public int JJTPARAM = 9;
+  public int JJTMETHODPARAMS = 8;
+  public int JJTMETHODPARAM = 9;
   public int JJTTYPE = 10;
   public int JJTVARIABLE = 11;
   public int JJTASSIGN = 12;
   public int JJTLHS = 13;
   public int JJTRHS = 14;
-  public int JJTEXPRSTMT = 15;
-  public int JJTIF = 16;
-  public int JJTIFCONDITION = 17;
-  public int JJTELSE = 18;
-  public int JJTWHILE = 19;
-  public int JJTWHILECONDITION = 20;
-  public int JJTAND = 21;
-  public int JJTLESSTHAN = 22;
-  public int JJTADD = 23;
-  public int JJTSUB = 24;
-  public int JJTMUL = 25;
-  public int JJTDIV = 26;
-  public int JJTMETHODCALL = 27;
+  public int JJTIF = 15;
+  public int JJTIFCONDITION = 16;
+  public int JJTELSE = 17;
+  public int JJTWHILE = 18;
+  public int JJTWHILECONDITION = 19;
+  public int JJTAND = 20;
+  public int JJTLESSTHAN = 21;
+  public int JJTADD = 22;
+  public int JJTSUB = 23;
+  public int JJTMUL = 24;
+  public int JJTDIV = 25;
+  public int JJTMETHODCALL = 26;
+  public int JJTMETHODCALLARGS = 27;
   public int JJTINTEGER = 28;
   public int JJTTRUE = 29;
   public int JJTFALSE = 30;
@@ -48,14 +48,13 @@ public interface ParserTreeConstants
     "Main",
     "Method",
     "Return",
-    "Params",
-    "Param",
+    "MethodParams",
+    "MethodParam",
     "Type",
     "Variable",
     "Assign",
     "Lhs",
     "Rhs",
-    "ExprStmt",
     "If",
     "IfCondition",
     "Else",
@@ -68,6 +67,7 @@ public interface ParserTreeConstants
     "Mul",
     "Div",
     "MethodCall",
+    "MethodCallArgs",
     "Integer",
     "True",
     "False",
@@ -76,4 +76,4 @@ public interface ParserTreeConstants
     "New",
   };
 }
-/* JavaCC - OriginalChecksum=89774fa5ac3b3807695a40953abc391d (do not edit this line) */
+/* JavaCC - OriginalChecksum=683478b31af484be9ca0d52f9be9f831 (do not edit this line) */

@@ -46,13 +46,21 @@ public class jmmc {
 
       // Print AST
       root.dump("");
+
+      // Build symbol table
+      build_symbol_table(root);
     } catch (ParseException e) {
       System.out.println("Error parsing.");
       System.out.println(e.getMessage());
     } catch (TokenMgrError e) {
-      System.out.println("Error.");
+      System.out.println("Error with token.");
       System.out.println(e.getMessage());
     }
+  }
+
+  public void build_symbol_table(SimpleNode root) {
+    System.out.println("building symbol table...");
+    System.out.println("not done yet, obviously");
   }
 
   public static InputStream read_input_file(String inputFile) throws IOException {
