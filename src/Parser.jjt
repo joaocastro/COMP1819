@@ -7,8 +7,8 @@
 options {
 	LOOKAHEAD=1;
 	MULTI=true;
+	VISITOR=true;
 	JJTREE_OUTPUT_DIRECTORY = "AST";
-	
 }
 
 PARSER_BEGIN(Parser)
@@ -161,8 +161,13 @@ void MethodDecl() #Method : {Token t;}
 	<LBRACKET>
 		(LOOKAHEAD(2) VarDecl())*
 		(Stmt())*
-		<RETURN> (Expr())? <SEMICOLON>
+		ReturnStmt()
 	<RBRACKET>
+}
+
+void ReturnStmt() : {}
+{
+	<RETURN> (Expr())? <SEMICOLON>
 }
 
 void MethodParams() : {}
@@ -218,7 +223,7 @@ void AssignStmt() #Assign : {Token t;}
 
 void Lhs() : {Token t;}
 {
-	t=<IDENTIFIER> {jjtThis.val = t.image;} ArrayAcc()
+	t=<IDENTIFIER> {jjtThis.val = t.image;} (ArrayAcc())?
 }
 
 void Rhs() : {Token t;}
@@ -228,7 +233,7 @@ void Rhs() : {Token t;}
 
 void ArrayAcc() #void : {}
 {
-	(<LSQPARENS> Expr() <RSQPARENS>)?
+	<LSQPARENS> Expr() <RSQPARENS>
 } 
 
 void ExprStmt() #void : {}
@@ -303,10 +308,9 @@ void ExprSuffix() #ExprSuffix(> 1) : {Token t;}
 {
 	ExprPrefix()
 	(
-		<LSQPARENS> Expr() <RSQPARENS>
+		ArrayAcc() {jjtThis.kind = "ArrayAccess";}
 		|
-		jjtThis.val=MethodCall()
-		{jjtThis.kind = "MethodCall";}
+		jjtThis.val=MethodCall() {jjtThis.kind = "MethodCall";}
 	)*
 }
 

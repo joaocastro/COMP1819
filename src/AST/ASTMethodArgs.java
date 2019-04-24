@@ -12,5 +12,11 @@ class ASTMethodArgs extends SimpleNode {
     super(p, id);
   }
 
+  /** Accept the visitor. **/
+  public Object jjtAccept(ParserVisitor visitor, Object data) {
+
+    return
+    visitor.visit(this, data);
+  }
 }
 /* JavaCC - OriginalChecksum=f4322de625b7000475f34e6d337eb87b (do not edit this line) */

@@ -15,5 +15,12 @@ class ASTParam extends SimpleNode {
   public void dump(String prefix) {
     System.out.println(toString(prefix) + " " + children[0].toString());
   }
+
+  /** Accept the visitor. **/
+  public Object jjtAccept(ParserVisitor visitor, Object data) {
+
+    return
+    visitor.visit(this, data);
+  }
 }
 /* JavaCC - OriginalChecksum=46c3142ce25c1eaf705d9ab2fe382707 (do not edit this line) */

@@ -12,5 +12,11 @@ class ASTParams extends SimpleNode {
     super(p, id);
   }
 
+  /** Accept the visitor. **/
+  public Object jjtAccept(ParserVisitor visitor, Object data) {
+
+    return
+    visitor.visit(this, data);
+  }
 }
 /* JavaCC - OriginalChecksum=49860d6e6900bc7cd98d6ded3cd7c8d0 (do not edit this line) */

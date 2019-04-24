@@ -11,32 +11,33 @@ public interface ParserTreeConstants
   public int JJTMAIN = 5;
   public int JJTMETHOD = 6;
   public int JJTRETURN = 7;
-  public int JJTMETHODPARAMS = 8;
-  public int JJTMETHODPARAM = 9;
-  public int JJTTYPE = 10;
-  public int JJTVARIABLE = 11;
-  public int JJTASSIGN = 12;
-  public int JJTLHS = 13;
-  public int JJTRHS = 14;
-  public int JJTIF = 15;
-  public int JJTIFCONDITION = 16;
-  public int JJTELSE = 17;
-  public int JJTWHILE = 18;
-  public int JJTWHILECONDITION = 19;
-  public int JJTAND = 20;
-  public int JJTLESSTHAN = 21;
-  public int JJTADD = 22;
-  public int JJTSUB = 23;
-  public int JJTMUL = 24;
-  public int JJTDIV = 25;
-  public int JJTEXPRSUFFIX = 26;
-  public int JJTMETHODCALLARGS = 27;
-  public int JJTINTEGER = 28;
-  public int JJTTRUE = 29;
-  public int JJTFALSE = 30;
-  public int JJTID = 31;
-  public int JJTTHIS = 32;
-  public int JJTNEW = 33;
+  public int JJTRETURNSTMT = 8;
+  public int JJTMETHODPARAMS = 9;
+  public int JJTMETHODPARAM = 10;
+  public int JJTTYPE = 11;
+  public int JJTVARIABLE = 12;
+  public int JJTASSIGN = 13;
+  public int JJTLHS = 14;
+  public int JJTRHS = 15;
+  public int JJTIF = 16;
+  public int JJTIFCONDITION = 17;
+  public int JJTELSE = 18;
+  public int JJTWHILE = 19;
+  public int JJTWHILECONDITION = 20;
+  public int JJTAND = 21;
+  public int JJTLESSTHAN = 22;
+  public int JJTADD = 23;
+  public int JJTSUB = 24;
+  public int JJTMUL = 25;
+  public int JJTDIV = 26;
+  public int JJTEXPRSUFFIX = 27;
+  public int JJTMETHODCALLARGS = 28;
+  public int JJTINTEGER = 29;
+  public int JJTTRUE = 30;
+  public int JJTFALSE = 31;
+  public int JJTID = 32;
+  public int JJTTHIS = 33;
+  public int JJTNEW = 34;
 
 
   public String[] jjtNodeName = {
@@ -48,6 +49,7 @@ public interface ParserTreeConstants
     "Main",
     "Method",
     "Return",
+    "ReturnStmt",
     "MethodParams",
     "MethodParam",
     "Type",
@@ -76,4 +78,4 @@ public interface ParserTreeConstants
     "New",
   };
 }
-/* JavaCC - OriginalChecksum=fb9fa85b42a91a96b3b07917ca7079e7 (do not edit this line) */
+/* JavaCC - OriginalChecksum=4bd4d9b47cf8cb7ce4651e97f2a91fcb (do not edit this line) */

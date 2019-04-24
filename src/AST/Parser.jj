@@ -8,6 +8,7 @@
 options {
 	LOOKAHEAD=1;
 	           
+	             
 	                                
 }
 
@@ -334,8 +335,39 @@ void MethodDecl()         : {/*@bgen(jjtree) Method */
 	<LBRACKET>
 		(LOOKAHEAD(2) VarDecl())*
 		(Stmt())*
-		<RETURN> (Expr())? <SEMICOLON>
+		ReturnStmt()
 	<RBRACKET>/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+/*@egen*/
+}
+
+void ReturnStmt() : {/*@bgen(jjtree) ReturnStmt */
+  ASTReturnStmt jjtn000 = new ASTReturnStmt(JJTRETURNSTMT);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
+{/*@bgen(jjtree) ReturnStmt */
+        try {
+/*@egen*/
+	<RETURN> (Expr())? <SEMICOLON>/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -548,7 +580,7 @@ void Lhs() : {/*@bgen(jjtree) Lhs */
 {/*@bgen(jjtree) Lhs */
         try {
 /*@egen*/
-	t=<IDENTIFIER> {jjtn000.val = t.image;} ArrayAcc()/*@bgen(jjtree)*/
+	t=<IDENTIFIER> {jjtn000.val = t.image;} (ArrayAcc())?/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -604,7 +636,7 @@ void Rhs() : {/*@bgen(jjtree) Rhs */
 
 void ArrayAcc()       : {}
 {
-	(<LSQPARENS> Expr() <RSQPARENS>)?
+	<LSQPARENS> Expr() <RSQPARENS>
 } 
 
 void ExprStmt()       : {}
@@ -980,10 +1012,9 @@ void ExprSuffix()                  : {/*@bgen(jjtree) #ExprSuffix(> 1) */
 /*@egen*/
 	ExprPrefix()
 	(
-		<LSQPARENS> Expr() <RSQPARENS>
+		ArrayAcc() {jjtn000.kind = "ArrayAccess";}
 		|
-		jjtn000.val=MethodCall()
-		{jjtn000.kind = "MethodCall";}
+		jjtn000.val=MethodCall() {jjtn000.kind = "MethodCall";}
 	)*/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {

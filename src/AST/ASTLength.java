@@ -12,5 +12,11 @@ class ASTLength extends SimpleNode {
     super(p, id);
   }
 
+  /** Accept the visitor. **/
+  public Object jjtAccept(ParserVisitor visitor, Object data) {
+
+    return
+    visitor.visit(this, data);
+  }
 }
 /* JavaCC - OriginalChecksum=a87c650f46a9f1099f0b2e369e7059de (do not edit this line) */

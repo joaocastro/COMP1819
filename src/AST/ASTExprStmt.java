@@ -12,5 +12,11 @@ class ASTExprStmt extends SimpleNode {
     super(p, id);
   }
 
+  /** Accept the visitor. **/
+  public Object jjtAccept(ParserVisitor visitor, Object data) {
+
+    return
+    visitor.visit(this, data);
+  }
 }
 /* JavaCC - OriginalChecksum=41a599b6cf87f5030d414aa6666d1196 (do not edit this line) */

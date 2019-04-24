@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.List;
 
 public class jmmc {
-  private HashMap<String, SymbolTable> symbol_tables =
+  private HashMap<String, SymbolTable> root_symbol_table =
       new HashMap<String, SymbolTable>();
 
   public static String file_name = "";

@@ -12,5 +12,11 @@ class ASTerror_skipto extends SimpleNode {
     super(p, id);
   }
 
+  /** Accept the visitor. **/
+  public Object jjtAccept(ParserVisitor visitor, Object data) {
+
+    return
+    visitor.visit(this, data);
+  }
 }
 /* JavaCC - OriginalChecksum=8ca5417e73294596a51cf53f894ab467 (do not edit this line) */
