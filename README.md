@@ -1,4 +1,4 @@
-# jmmc
+# jmm
 
 A compiler of Java-- ([MiniJava][minijava]) programs to Java bytecode. 
 
@@ -12,11 +12,11 @@ jjtree Parser.jjt
 cd AST/
 javacc Parser.jj
 cd ..
-javac jmmc.java
+javac jmm.java
 ```
-To compile a Java-- file, use
+To use the built compiler, run
 ```
-java jmmc <jmm file>
+java jmm [-r=<num>] [-o] <input_file.jmm>
 ```
 
 [minijava]: http://www.cs.tufts.edu/~sguyer/classes/comp181-2006/minijava.html

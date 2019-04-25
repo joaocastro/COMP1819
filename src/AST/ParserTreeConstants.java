@@ -3,7 +3,7 @@ package AST;
 
 public interface ParserTreeConstants
 {
-  public int JJTSTART = 0;
+  public int JJTPROGRAM = 0;
   public int JJTCLASS = 1;
   public int JJTNAME = 2;
   public int JJTVOID = 3;
@@ -41,7 +41,7 @@ public interface ParserTreeConstants
 
 
   public String[] jjtNodeName = {
-    "Start",
+    "Program",
     "Class",
     "Name",
     "void",
@@ -78,4 +78,4 @@ public interface ParserTreeConstants
     "New",
   };
 }
-/* JavaCC - OriginalChecksum=4bd4d9b47cf8cb7ce4651e97f2a91fcb (do not edit this line) */
+/* JavaCC - OriginalChecksum=d672099dc5c3a325886f133eb9abe21b (do not edit this line) */

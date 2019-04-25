@@ -28,8 +28,8 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
  * Grammar definition
  */
   static final public 
-SimpleNode Program() throws ParseException {/*@bgen(jjtree) Start */
-  ASTStart jjtn000 = new ASTStart(JJTSTART);
+SimpleNode Program() throws ParseException {/*@bgen(jjtree) Program */
+  ASTProgram jjtn000 = new ASTProgram(JJTPROGRAM);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {

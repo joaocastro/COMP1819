@@ -124,7 +124,7 @@ TOKEN :
  * Grammar definition
  */
 
-SimpleNode Program() #Start : {}
+SimpleNode Program() : {}
 {
 	ClassDecl() <EOF> { return jjtThis; }
 }

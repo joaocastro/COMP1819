@@ -128,12 +128,12 @@ TOKEN :
  * Grammar definition
  */
 
-SimpleNode Program()        : {/*@bgen(jjtree) Start */
-  ASTStart jjtn000 = new ASTStart(JJTSTART);
+SimpleNode Program() : {/*@bgen(jjtree) Program */
+  ASTProgram jjtn000 = new ASTProgram(JJTPROGRAM);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
 /*@egen*/}
-{/*@bgen(jjtree) Start */
+{/*@bgen(jjtree) Program */
         try {
 /*@egen*/
 	ClassDecl() <EOF>/*@bgen(jjtree)*/

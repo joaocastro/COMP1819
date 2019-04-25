@@ -1,5 +1,5 @@
 /*
- * jmmc.java
+ * jmm.java
  *
  * A Java-- (MiniJava) compiler.
  */
@@ -14,14 +14,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.List;
 
-public class jmmc {
-  private HashMap<String, SymbolTable> root_symbol_table =
-      new HashMap<String, SymbolTable>();
-
-  public static String file_name = "";
-
-  private String module_name;
-  private int error_count = 0;
+public class jmm {
+  private SymbolTable root_symbol_table = new SymbolTable();
 
   public static void main(String args[]) throws ParseException, IOException {
     try {
@@ -30,14 +24,14 @@ public class jmmc {
 
       Parser parser = new Parser(parserStream);
       
-      new jmmc(parser);
+      new jmm(parser);
     } catch (FileNotFoundException e) {
       System.out.println("File does not exist.");
       return;
     }
   }
 
-  public jmmc(Parser parser) {
+  public jmm(Parser parser) {
     try {
       // Begin parsing
       SimpleNode root = parser.Program();
@@ -58,6 +52,9 @@ public class jmmc {
 
   public void build_symbol_table(SimpleNode root) {
     System.out.println("building symbol table...");
+    if (root != null && root instanceof ASTProgram) {
+      System.out.println("found root node");
+    }
     System.out.println("not done yet, obviously");
   }
 

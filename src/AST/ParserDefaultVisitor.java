@@ -9,7 +9,7 @@ public class ParserDefaultVisitor implements ParserVisitor{
   public Object visit(SimpleNode node, Object data){
     return defaultVisit(node, data);
   }
-  public Object visit(ASTStart node, Object data){
+  public Object visit(ASTProgram node, Object data){
     return defaultVisit(node, data);
   }
   public Object visit(ASTClass node, Object data){
@@ -112,4 +112,4 @@ public class ParserDefaultVisitor implements ParserVisitor{
     return defaultVisit(node, data);
   }
 }
-/* JavaCC - OriginalChecksum=f9b83f93b946f4c6cc54a4ff7c13497c (do not edit this line) */
+/* JavaCC - OriginalChecksum=db61674c06009d24a473081c748e3968 (do not edit this line) */

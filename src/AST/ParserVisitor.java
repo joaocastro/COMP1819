@@ -4,7 +4,7 @@ package AST;
 public interface ParserVisitor
 {
   public Object visit(SimpleNode node, Object data);
-  public Object visit(ASTStart node, Object data);
+  public Object visit(ASTProgram node, Object data);
   public Object visit(ASTClass node, Object data);
   public Object visit(ASTName node, Object data);
   public Object visit(ASTExtends node, Object data);
@@ -39,4 +39,4 @@ public interface ParserVisitor
   public Object visit(ASTThis node, Object data);
   public Object visit(ASTNew node, Object data);
 }
-/* JavaCC - OriginalChecksum=cdd56e74ba2777ffa97f987668313812 (do not edit this line) */
+/* JavaCC - OriginalChecksum=6156bf4fce241c46f7f377cefdf07c2f (do not edit this line) */
