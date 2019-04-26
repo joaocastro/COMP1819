@@ -60,6 +60,9 @@ public class jmm {
         n.jjtAccept(visitor, (Object) root_symbol_table);
       }
     }
+
+    for (String key : root_symbol_table.getLocals().keySet())
+      System.out.println(key);
   }
 
   public static InputStream read_input_file(String inputFile) throws IOException {
