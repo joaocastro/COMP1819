@@ -46,12 +46,20 @@ class SimpleNode implements Node {
     return children[i];
   }
 
+  public Node[] jjtGetChildren() {
+    return children;
+  }
+
   public int jjtGetNumChildren() {
     return (children == null) ? 0 : children.length;
   }
 
   public void jjtSetValue(Object value) { this.value = value; }
   public Object jjtGetValue() { return value; }
+
+  public String getVal() {
+    return val;
+  }
 
   /** Accept the visitor. **/
   public Object jjtAccept(ParserVisitor visitor, Object data)

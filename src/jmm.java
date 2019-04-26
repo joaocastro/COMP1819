@@ -7,12 +7,6 @@
 import AST.*;
 import Symbol.*;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.List;
 
 public class jmm {
   private SymbolTable root_symbol_table = new SymbolTable();
@@ -40,7 +34,13 @@ public class jmm {
       root.dump("");
 
       // Build symbol table
+      System.out.println("building symbol table...");
       build_symbol_table(root);
+
+      // TODO: Perform semantic analysis
+
+      // TODO: Generate code
+
     } catch (ParseException e) {
       System.out.println("Error parsing.");
       System.out.println(e.getMessage());
@@ -51,11 +51,15 @@ public class jmm {
   }
 
   public void build_symbol_table(SimpleNode root) {
-    System.out.println("building symbol table...");
+    SymbolVisitor visitor = new SymbolVisitor();
+
     if (root != null && root instanceof ASTProgram) {
       System.out.println("found root node");
+
+      for (Node n : root.jjtGetChildren()) {
+        n.jjtAccept(visitor, (Object) root_symbol_table);
+      }
     }
-    System.out.println("not done yet, obviously");
   }
 
   public static InputStream read_input_file(String inputFile) throws IOException {
