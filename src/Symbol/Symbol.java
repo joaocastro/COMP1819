@@ -40,4 +40,8 @@ public class Symbol {
     public int hashCode() {
         return name.hashCode();
     }
+
+    public String toString() {
+        return this.name + " - " + this.type;
+    }
 }

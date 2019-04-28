@@ -4,15 +4,17 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class SymbolTable implements Cloneable {
+  private String name;
   private LinkedHashMap<String, Symbol> params;
   private LinkedHashMap<String, Symbol> locals;
   private LinkedHashMap<String, SymbolTable> children;
-  private SymbolTable parent;
+  private SymbolTable parent = null;
   
   private Symbol returnSymbol = null;
   private boolean returned = false;
 
-  public SymbolTable() {
+  public SymbolTable(String name) {
+    this.name = name;
     this.params = new LinkedHashMap<String, Symbol>();
     this.locals = new LinkedHashMap<String, Symbol>();
   }
@@ -61,12 +63,34 @@ public class SymbolTable implements Cloneable {
     }
   }
 
+  public boolean addParam(String name, String type) {
+    if (this.params.containsKey(name)) {
+      return false;
+    } else {
+      Symbol s = new Symbol(name, type, true);
+      this.params.put(name, s);
+      return true;
+    }
+  }
+
   public void removeVariable(String name) {
     if (!this.locals.containsKey(name)) {
       return;
     } else {
       this.locals.remove(name);
     }
+  }
+
+  public void show(String prefix) {
+    System.out.println(prefix + "name: " + this.name);
+    
+    System.out.println(prefix + "params:");
+    for (Symbol s : this.params.values())
+      System.out.println(prefix + s.toString());
+
+    System.out.println(prefix + "locals:");
+    for (Symbol s : this.locals.values())
+      System.out.println(prefix + s.toString());
   }
 
   @SuppressWarnings("unchecked")

@@ -9,7 +9,7 @@ import Symbol.*;
 import java.io.*;
 
 public class jmm {
-  private SymbolTable root_symbol_table = new SymbolTable();
+  private SymbolTable root_symbol_table = new SymbolTable("root");
 
   public static void main(String args[]) throws ParseException, IOException {
     try {
@@ -53,16 +53,11 @@ public class jmm {
   public void build_symbol_table(SimpleNode root) {
     SymbolVisitor visitor = new SymbolVisitor();
 
-    if (root != null && root instanceof ASTProgram) {
-      System.out.println("found root node");
+    // Go through tree and build symbol table
+    root.jjtAccept(visitor, (Object) root_symbol_table);
 
-      for (Node n : root.jjtGetChildren()) {
-        n.jjtAccept(visitor, (Object) root_symbol_table);
-      }
-    }
-
-    for (String key : root_symbol_table.getLocals().keySet())
-      System.out.println(key);
+    // Print contents of symbol table
+    root_symbol_table.show("");
   }
 
   public static InputStream read_input_file(String inputFile) throws IOException {

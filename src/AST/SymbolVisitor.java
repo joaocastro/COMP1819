@@ -5,8 +5,6 @@ import Symbol.SymbolTable;
 
 public class SymbolVisitor implements ParserVisitor{
   public Object defaultVisit(SimpleNode node, Object data){
-    System.out.println("found a node");
-
     node.childrenAccept(this, data);
     return data;
   }
@@ -14,6 +12,7 @@ public class SymbolVisitor implements ParserVisitor{
     return defaultVisit(node, data);
   }
   public Object visit(ASTProgram node, Object data){
+    System.out.println("found root node");
     return defaultVisit(node, data);
   }
   public Object visit(ASTClass node, Object data){
@@ -43,7 +42,14 @@ public class SymbolVisitor implements ParserVisitor{
     return defaultVisit(node, data);
   }
   public Object visit(ASTMethodParam node, Object data){
-    return defaultVisit(node, data);
+    System.out.println("found method param");
+    String name = node.val;
+    String type = ((SimpleNode) node.jjtGetChild(0)).getVal();
+    
+    SymbolTable st = (SymbolTable) data;
+    st.addParam(name, type);
+    
+    return defaultVisit(node, st);
   }
   public Object visit(ASTType node, Object data){
     return defaultVisit(node, data);
