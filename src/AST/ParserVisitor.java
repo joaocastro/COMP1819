@@ -39,4 +39,4 @@ public interface ParserVisitor
   public Object visit(ASTThis node, Object data);
   public Object visit(ASTNew node, Object data);
 }
-/* JavaCC - OriginalChecksum=6156bf4fce241c46f7f377cefdf07c2f (do not edit this line) */
+/* JavaCC - OriginalChecksum=0fcc4ce3123c1b9b30795251a2234e96 (do not edit this line) */

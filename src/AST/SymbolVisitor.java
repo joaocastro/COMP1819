@@ -29,9 +29,9 @@ public class SymbolVisitor implements ParserVisitor{
     return defaultVisit(node, data);
   }
   public Object visit(ASTMain node, Object data){
-    // TODO: do this
-
-    return defaultVisit(node, data);
+    SymbolTable st = (SymbolTable) data;
+  
+    return defaultVisit(node, st.addChild("main", "void"));
   }
   public Object visit(ASTMethod node, Object data){
     String method_name = ((SimpleNode) node.jjtGetChild(1)).getVal();
@@ -42,10 +42,26 @@ public class SymbolVisitor implements ParserVisitor{
     return defaultVisit(node, st.addChild(method_name, method_type));
   }
   public Object visit(ASTReturn node, Object data){
-    // TODO: add this node value to return_symbol
     return defaultVisit(node, data);
   }
-  public Object visit(ASTReturnStmt node, Object data){
+  public Object visit(ASTReturnStmt node, Object data){	
+	/*String return_name = ((SimpleNode) node.jjtGetChild(0)).getVal();
+	
+	SymbolTable st = (SymbolTable) data;
+	
+	Symbol sym = st.getLocals().get(return_name);
+	
+	if (sym == null)
+		sym = new Symbol(return_name, data.getReturnType());
+	
+	System.out.println("value lol derp: "+return_type);
+	
+	SymbolTable st = (SymbolTable) data;
+	
+	//st.setReturnSymbol()
+	*/
+	
+	  
     return defaultVisit(node, data);
   }
   public Object visit(ASTMethodParams node, Object data){

@@ -44,6 +44,10 @@ public class SymbolTable implements Cloneable {
 
     return null;
   }
+  
+  public String getReturnType() {
+	return return_type;
+  }
 
   public void setName(String name) {
     this.name = name;
