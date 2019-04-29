@@ -32,6 +32,10 @@ public class Symbol {
         this.init = val;
     }
 
+    public boolean equals(String name) {
+        return this.name.equals(name);
+    }
+
     public boolean equals(Object symbol) {
         Symbol s = (Symbol) symbol;
         return this.name.equals(s.getName());

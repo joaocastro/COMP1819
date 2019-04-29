@@ -1,6 +1,6 @@
 package AST;
 
-import Symbol.SymbolTable;
+import Symbol.*;
 
 public class SymbolVisitor implements ParserVisitor{
   public Object defaultVisit(SimpleNode node, Object data){
@@ -43,24 +43,7 @@ public class SymbolVisitor implements ParserVisitor{
   public Object visit(ASTReturn node, Object data){
     return defaultVisit(node, data);
   }
-  public Object visit(ASTReturnStmt node, Object data){	
-	/*String return_name = ((SimpleNode) node.jjtGetChild(0)).getVal();
-	
-	SymbolTable st = (SymbolTable) data;
-	
-	Symbol sym = st.getLocals().get(return_name);
-	
-	if (sym == null)
-		sym = new Symbol(return_name, data.getReturnType());
-	
-	System.out.println("value lol derp: "+return_type);
-	
-	SymbolTable st = (SymbolTable) data;
-	
-	//st.setReturnSymbol()
-	*/
-	
-	  
+  public Object visit(ASTReturnStmt node, Object data){		  
     return defaultVisit(node, data);
   }
   public Object visit(ASTMethodParams node, Object data){

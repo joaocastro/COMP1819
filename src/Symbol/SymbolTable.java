@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 public class SymbolTable implements Cloneable {
   private String name;
   private String return_type = "none";
-  
+
   private LinkedHashMap<String, Symbol> params;
   private LinkedHashMap<String, Symbol> locals;
   private LinkedHashMap<String, SymbolTable> children;
@@ -24,41 +24,38 @@ public class SymbolTable implements Cloneable {
     this.parent = parent;
   }
 
-  public LinkedHashMap<String, Symbol> getParams() {
-    return this.params;
+  public LinkedHashMap<String, Symbol> getParams() { return this.params; }
+
+  public LinkedHashMap<String, Symbol> getLocals() { return this.locals; }
+
+  public Symbol lookup(String name) {
+    for (Symbol s : this.params.values())
+      if (s.equals(name))
+        return s;
+
+    for (Symbol s : this.locals.values())
+      if (s.equals(name))
+        return s;
+
+    if (this.parent == null)
+      return null;
+
+    return this.parent.lookup(name);
   }
 
-  public LinkedHashMap<String, Symbol> getLocals() { 
-    return this.locals; 
-  }
+  public String getName() { return this.name; }
 
-  public SymbolTable getChild(String name) { 
-    return this.children.get(name); 
-  }
-  
-  public String getReturnType() {
-	return return_type;
-  }
+  public SymbolTable getChild(String name) { return this.children.get(name); }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+  public String getReturnType() { return return_type; }
 
-  public boolean addParameter(String name, String type) {
-    if (this.params.containsKey(name)) {
-      return false;
-    } else {
-      Symbol s = new Symbol(name, type, true);
-      this.params.put(name, s);
-      return true;
-    }
-  }
+  public void setName(String name) { this.name = name; }
 
   public boolean addVariable(String name, String type) {
     if (this.locals.containsKey(name)) {
       return false;
     } else {
-      Symbol s = new Symbol(name, type, true);
+      Symbol s = new Symbol(name, type);
       this.locals.put(name, s);
       return true;
     }
@@ -93,7 +90,7 @@ public class SymbolTable implements Cloneable {
   public void show(String prefix) {
     System.out.println(prefix + "name: " + this.name);
     System.out.println(prefix + "return type: " + this.return_type);
-    
+
     System.out.println(prefix + "params:");
     for (Symbol s : this.params.values())
       System.out.println(prefix + "  " + s.toString());
@@ -102,11 +99,11 @@ public class SymbolTable implements Cloneable {
     for (Symbol s : this.locals.values())
       System.out.println(prefix + "  " + s.toString());
 
-    
     System.out.println(prefix + "children:");
     for (SymbolTable s : this.children.values()) {
-      s.show("  "); 
-      System.out.println(prefix + "  " + "------");
+      s.show("  ");
+      System.out.println(prefix + "  "
+                         + "------");
     }
   }
 
@@ -115,7 +112,7 @@ public class SymbolTable implements Cloneable {
   public SymbolTable clone() throws CloneNotSupportedException {
     SymbolTable newTable = (SymbolTable)super.clone();
     newTable.locals = (LinkedHashMap<String, Symbol>)this.locals.clone();
-    
+
     return newTable;
   }
 }
