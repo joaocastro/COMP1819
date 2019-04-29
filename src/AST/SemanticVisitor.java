@@ -103,90 +103,42 @@ public class SemanticVisitor implements ParserVisitor {
   public Object visit(ASTAnd node, Object data) {
     SymbolTable st = (SymbolTable)data;
 
-    for (Node n : node.jjtGetChildren())
-      if (n instanceof ASTId) {
-        String id = ((SimpleNode)n).getVal();
-        Symbol sym = st.lookup(id);
-        if (sym != null)
-          if (sym.getInit() == false)
-            System.err.println(
-                "(error) this identifier has not been initialized: " + id);
-      }
+    checkInit(node, st);
 
     return defaultVisit(node, data);
   }
   public Object visit(ASTLessThan node, Object data) {
     SymbolTable st = (SymbolTable)data;
 
-    for (Node n : node.jjtGetChildren())
-      if (n instanceof ASTId) {
-        String id = ((SimpleNode)n).getVal();
-        Symbol sym = st.lookup(id);
-        if (sym != null)
-          if (sym.getInit() == false)
-            System.err.println(
-                "(error) this identifier has not been initialized: " + id);
-      }
+    checkInit(node, st);
 
     return defaultVisit(node, data);
   }
   public Object visit(ASTAdd node, Object data) {
     SymbolTable st = (SymbolTable)data;
 
-    for (Node n : node.jjtGetChildren())
-      if (n instanceof ASTId) {
-        String id = ((SimpleNode)n).getVal();
-        Symbol sym = st.lookup(id);
-        if (sym != null)
-          if (sym.getInit() == false)
-            System.err.println(
-                "(error) this identifier has not been initialized: " + id);
-      }
+    checkInit(node, st);
 
     return defaultVisit(node, data);
   }
   public Object visit(ASTSub node, Object data) {
     SymbolTable st = (SymbolTable)data;
 
-    for (Node n : node.jjtGetChildren())
-      if (n instanceof ASTId) {
-        String id = ((SimpleNode)n).getVal();
-        Symbol sym = st.lookup(id);
-        if (sym != null)
-          if (sym.getInit() == false)
-            System.err.println(
-                "(error) this identifier has not been initialized: " + id);
-      }
+    checkInit(node, st);
 
     return defaultVisit(node, data);
   }
   public Object visit(ASTMul node, Object data) {
     SymbolTable st = (SymbolTable)data;
 
-    for (Node n : node.jjtGetChildren())
-      if (n instanceof ASTId) {
-        String id = ((SimpleNode)n).getVal();
-        Symbol sym = st.lookup(id);
-        if (sym != null)
-          if (sym.getInit() == false)
-            System.err.println(
-                "(error) this identifier has not been initialized: " + id);
-      }
+    checkInit(node, st);
 
     return defaultVisit(node, data);
   }
   public Object visit(ASTDiv node, Object data) {
     SymbolTable st = (SymbolTable)data;
 
-    for (Node n : node.jjtGetChildren())
-      if (n instanceof ASTId) {
-        String id = ((SimpleNode)n).getVal();
-        Symbol sym = st.lookup(id);
-        if (sym != null)
-          if (sym.getInit() == false)
-            System.err.println(
-                "(error) this identifier has not been initialized: " + id);
-      }
+    checkInit(node, st);
 
     return defaultVisit(node, data);
   }
@@ -220,5 +172,17 @@ public class SemanticVisitor implements ParserVisitor {
   }
   public Object visit(ASTNew node, Object data) {
     return defaultVisit(node, data);
+  }
+
+  public void checkInit(SimpleNode node, SymbolTable st) {
+    for (Node n : node.jjtGetChildren())
+      if (n instanceof ASTId) {
+        String id = ((SimpleNode)n).getVal();
+        Symbol sym = st.lookup(id);
+        if (sym != null)
+          if (sym.getInit() == false)
+            System.err.println(
+                "(error) this identifier has not been initialized: " + id);
+      }
   }
 }
