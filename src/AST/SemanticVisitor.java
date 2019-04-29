@@ -30,7 +30,7 @@ public class SemanticVisitor implements ParserVisitor {
   public Object visit(ASTMethod node, Object data) {
     String method_name = ((SimpleNode)node.jjtGetChild(1)).getVal();
 
-    SymbolTable st = (SymbolTable) data;
+    SymbolTable st = (SymbolTable)data;
 
     return defaultVisit(node, st.getChild(method_name));
   }
@@ -38,6 +38,18 @@ public class SemanticVisitor implements ParserVisitor {
     return defaultVisit(node, data);
   }
   public Object visit(ASTReturnStmt node, Object data) {
+    SymbolTable st = (SymbolTable)data;
+
+    if (node.jjtGetChild(0) instanceof ASTId) {
+      String id = ((SimpleNode)node.jjtGetChild(0)).getVal();
+      Symbol sym = st.lookup(id);
+      
+      if (sym != null)
+        if (sym.getInit() == false)
+          System.err.println(
+              "(error) this identifier has not been initialized: " + id);
+    }
+
     return defaultVisit(node, data);
   }
   public Object visit(ASTMethodParams node, Object data) {
@@ -53,13 +65,14 @@ public class SemanticVisitor implements ParserVisitor {
     return defaultVisit(node, data);
   }
   public Object visit(ASTAssign node, Object data) {
-    String lhs = ((ASTLhs) node.jjtGetChild(0)).getVal();
+    String lhs = ((ASTLhs)node.jjtGetChild(0)).getVal();
 
-    SymbolTable st = (SymbolTable) data;
+    SymbolTable st = (SymbolTable)data;
     Symbol sym = st.lookup(lhs);
 
     if (sym == null) {
-      System.err.println("(error) trying to assign to undeclared variable: " + lhs);
+      System.err.println("(error) trying to assign to undeclared variable: " +
+                         lhs);
     } else {
       sym.setInit(true);
     }
@@ -67,8 +80,6 @@ public class SemanticVisitor implements ParserVisitor {
     return defaultVisit(node, data);
   }
   public Object visit(ASTLhs node, Object data) {
-    SymbolTable st = (SymbolTable)data;
-
     return defaultVisit(node, data);
   }
   public Object visit(ASTRhs node, Object data) {
@@ -102,7 +113,6 @@ public class SemanticVisitor implements ParserVisitor {
                 "(error) this identifier has not been initialized: " + id);
       }
 
-
     return defaultVisit(node, data);
   }
   public Object visit(ASTLessThan node, Object data) {
@@ -117,7 +127,6 @@ public class SemanticVisitor implements ParserVisitor {
             System.err.println(
                 "(error) this identifier has not been initialized: " + id);
       }
-
 
     return defaultVisit(node, data);
   }
@@ -148,7 +157,6 @@ public class SemanticVisitor implements ParserVisitor {
             System.err.println(
                 "(error) this identifier has not been initialized: " + id);
       }
-
 
     return defaultVisit(node, data);
   }
