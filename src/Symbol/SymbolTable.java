@@ -5,12 +5,11 @@ import java.util.LinkedHashMap;
 public class SymbolTable implements Cloneable {
   private String name;
   private String return_type = "none";
-  private Symbol returnSymbol;
   
   private LinkedHashMap<String, Symbol> params;
   private LinkedHashMap<String, Symbol> locals;
   private LinkedHashMap<String, SymbolTable> children;
-  private SymbolTable parent;
+  private SymbolTable parent = null;
 
   public SymbolTable(String name) {
     this.name = name;
@@ -36,13 +35,6 @@ public class SymbolTable implements Cloneable {
   public SymbolTable getChild(String name) { 
     return this.children.get(name); 
   }
-
-  public Symbol getReturnSymbol() {
-    if (this.returnSymbol != null)
-      return this.returnSymbol;
-
-    return null;
-  }
   
   public String getReturnType() {
 	return return_type;
@@ -50,11 +42,6 @@ public class SymbolTable implements Cloneable {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public void setReturnSymbol(String name, String type) {
-    Symbol s = new Symbol(name, type);
-    this.returnSymbol = s;
   }
 
   public boolean addParameter(String name, String type) {

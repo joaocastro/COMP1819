@@ -37,7 +37,9 @@ public class jmm {
       System.out.println("building symbol table...");
       build_symbol_table(root);
 
-      // TODO: Perform semantic analysis
+      // Perform semantic analysis
+      System.out.println("performing semantic analysis...");
+      perform_semantic_analysis(root);
 
       // TODO: Generate code
 
@@ -58,6 +60,13 @@ public class jmm {
 
     // Print contents of symbol table
     root_symbol_table.show("");
+  }
+
+  public void perform_semantic_analysis(SimpleNode root) {
+    SemanticVisitor visitor = new SemanticVisitor();
+
+    // Go through tree and build symbol table
+    root.jjtAccept(visitor, (Object) root_symbol_table);
   }
 
   public static InputStream read_input_file(String inputFile) throws IOException {
