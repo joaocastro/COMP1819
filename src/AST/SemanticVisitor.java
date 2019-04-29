@@ -199,8 +199,6 @@ public class SemanticVisitor implements ParserVisitor {
   }
   public Object visit(ASTId node, Object data) {
     SymbolTable st = (SymbolTable)data;
-    System.out.println("(" + st.getName() +
-                       ") found identifier (Id): " + node.val);
 
     if (st.lookup(node.val) == null)
       System.err.println(
