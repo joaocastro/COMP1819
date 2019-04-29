@@ -1,7 +1,6 @@
 package Symbol;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class SymbolTable implements Cloneable {
   private String name;
@@ -110,11 +109,11 @@ public class SymbolTable implements Cloneable {
     
     System.out.println(prefix + "params:");
     for (Symbol s : this.params.values())
-      System.out.println(prefix + s.toString());
+      System.out.println(prefix + "  " + s.toString());
 
     System.out.println(prefix + "locals:");
     for (Symbol s : this.locals.values())
-      System.out.println(prefix + s.toString());
+      System.out.println(prefix + "  " + s.toString());
 
     
     System.out.println(prefix + "children:");
