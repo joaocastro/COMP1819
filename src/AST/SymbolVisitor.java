@@ -12,13 +12,15 @@ public class SymbolVisitor implements ParserVisitor{
     return defaultVisit(node, data);
   }
   public Object visit(ASTProgram node, Object data){
-    System.out.println("found root node");
     return defaultVisit(node, data);
   }
   public Object visit(ASTClass node, Object data){
     String class_name = ((SimpleNode) node.jjtGetChild(0)).getVal();
-    System.out.println("found class " + class_name);
-    return defaultVisit(node, data);
+
+    SymbolTable st = (SymbolTable) data;
+    st.setName(class_name);
+
+    return defaultVisit(node, st);
   }
   public Object visit(ASTName node, Object data){
     return defaultVisit(node, data);
@@ -27,12 +29,20 @@ public class SymbolVisitor implements ParserVisitor{
     return defaultVisit(node, data);
   }
   public Object visit(ASTMain node, Object data){
+    // TODO: do this
+
     return defaultVisit(node, data);
   }
   public Object visit(ASTMethod node, Object data){
-    return defaultVisit(node, data);
+    String method_name = ((SimpleNode) node.jjtGetChild(1)).getVal();
+    String method_type = ((SimpleNode) node.jjtGetChild(0).jjtGetChild(0)).getVal();
+    
+    SymbolTable st = (SymbolTable) data;
+  
+    return defaultVisit(node, st.addChild(method_name, method_type));
   }
   public Object visit(ASTReturn node, Object data){
+    // TODO: add this node value to return_symbol
     return defaultVisit(node, data);
   }
   public Object visit(ASTReturnStmt node, Object data){
@@ -42,7 +52,6 @@ public class SymbolVisitor implements ParserVisitor{
     return defaultVisit(node, data);
   }
   public Object visit(ASTMethodParam node, Object data){
-    System.out.println("found method param");
     String name = node.val;
     String type = ((SimpleNode) node.jjtGetChild(0)).getVal();
     
@@ -55,7 +64,6 @@ public class SymbolVisitor implements ParserVisitor{
     return defaultVisit(node, data);
   }
   public Object visit(ASTVariable node, Object data){
-    System.out.println("found variable");
     String name = node.val;
     String type = ((SimpleNode) node.jjtGetChild(0)).getVal();
     
