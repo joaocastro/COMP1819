@@ -29,11 +29,13 @@ all: $(PROG)
 $(PROG): 
 	cd src && \
 	jjtree Parser.jjt && \
+	cd AST && \
 	javacc Parser.jj && \
-	javac *.java && \
+	cd .. && \
+	javac jmm.java && \
 	cd ..
 
 run:
 	cd src && \
-	java Parser $(IN) && \
+	java jmm $(IN) && \
 	cd ..
