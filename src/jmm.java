@@ -7,14 +7,17 @@
 import AST.*;
 import Symbol.*;
 import java.io.*;
+import Jasmin.*;
 
 public class jmm {
+  private static String file_name = "null";
   private SymbolTable root_symbol_table = new SymbolTable("root");
 
   public static void main(String args[]) throws ParseException, IOException {
     try {
-      InputStream parserStream =
-        (args.length == 0) ? System.in : read_input_file(args[0]);
+		file_name = args[0];
+      
+      InputStream parserStream = read_input_file(file_name);
 
       Parser parser = new Parser(parserStream);
       
@@ -41,13 +44,19 @@ public class jmm {
       System.out.println("performing semantic analysis...");
       perform_semantic_analysis(root);
 
-      // TODO: Generate code
-
+	  // Generate code
+      file_name = file_name.substring(file_name.indexOf('/') + 1, file_name.indexOf('.'));
+      root.jjtSetValue(file_name);
+      Bytecodes.generateJavaBytecodes(root, root_symbol_table);
+				
     } catch (ParseException e) {
       System.out.println("Error parsing.");
       System.out.println(e.getMessage());
     } catch (TokenMgrError e) {
       System.out.println("Error with token.");
+      System.out.println(e.getMessage());
+    } catch (IOException e) {
+      System.out.println("Error with i/o.");
       System.out.println(e.getMessage());
     }
   }
