@@ -9,7 +9,7 @@ public class Bytecodes {
 
 	private static SymbolTable symbolTable;
 	private static PrintWriter writer;
-	private static ArrayList<String> register_variables;
+	private static ArrayList<String> register_variables = new ArrayList<>();
 	private static int stack = 0;
 	private static int locals = 0;
 
