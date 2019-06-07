@@ -1,16 +1,16 @@
 # jmm (group 65)
 
-NAME1: Guilherme Vale, NR1: 201709049, GRADE1: 13, CONTRIBUTION1: 35%
+NAME1: Guilherme Vale, NR: 201709049, GRADE: 13, CONTRIBUTION: 35%
 
-NAME2: João Pedro Castro, NR2: 201404896, GRADE2: 12, CONTRIBUTION2: 27,5%
+NAME2: João Pedro Castro, NR: 201404896, GRADE: 12, CONTRIBUTION: 30%
 
-NAME3: Miguel Pedrosa, NR2: 201604343, GRADE2: 11, CONTRIBUTION2: 27,5%
+NAME3: Miguel Pedrosa, NR: 201604343, GRADE: 12, CONTRIBUTION: 30%
 
-NAME4: Guilherme Amaro, NR2: 201508537, GRADE2: 9, CONTRIBUTION2: 5%
+NAME4: Guilherme Amaro, NR: 201508537, GRADE: 9, CONTRIBUTION: 5%
 
-(Note that the sum of the CONTRIBUTION? values must be 100 %)
 
-### GLOBAL Grade of the project: 13
+## GLOBAL Grade of the project: 13
+
 
 ### SUMMARY: 
 
@@ -18,6 +18,7 @@ A compiler of Java-- ([MiniJava][minijava]) programs to Java bytecode.
 Given a file written in Java--, the compiler will generate ASCII descriptions of the Java classes
 in the file, written in an assembler-like syntax, which can be fed to [Jasmin][jasmin] to create 
 binary Java class files.
+
 
 ### EXECUTE: 
 
@@ -35,15 +36,17 @@ To use the built compiler, run
 java jmm <input_file.jmm>
 ```
 
-A `Makefile` is made available which speeds up the building process. Running `make` in the root 
+A `Makefile` is made available which speeds up the building process. Running `make`, followed by `make run` in the root 
 should run the sequence of steps outlined above.
 
 A suite of example Java-- files is included in `src/test/`, for the sake of convenience.
+
 
 ### DEALING WITH SYNTACTIC ERRORS: 
 
 The compiler will exit early if it detects a token not found in the defined grammar. The compiler only handles 
 errors for `while` loop conditions. It treats this sort of error by skipping to the next opening bracket.
+
 
 ### SEMANTIC ANALYSIS: 
 
@@ -53,13 +56,16 @@ variables (in current or parent scopes).
 
 The symbol table construction and semantic analysis are done using the [visitor pattern][visitor].
 
+
 ### INTERMEDIATE REPRESENTATIONS (IRs): 
 
 No intermediate representation was created. The code generation is done via just the syntax tree and the symbol table.
 
+
 ### CODE GENERATION: 
 
-(when applicable, describe how the code generation of your tool works and identify the possible problems your tool has regarding code generation.)
+Code generation is capable of launching a .j file that can be interpreted by Jasmin. It can't convert every information read from the symbol table, but can create the basic structure of the language and some other data
+
 
 ## OVERVIEW: 
 
@@ -67,6 +73,7 @@ The approach taken was relatively straight-forward and conventional.
 The visitor pattern is used for processing the tree for symbol table generation and semantic analysis, whereas a *regular* "children-iterator" approach is taken for code generation. 
 
 The starting point of the application is in `src/jmm.java`, with all of the parser logic located in `src/Parser.jjt`.
+
 
 ### TASK DISTRIBUTION: 
 
@@ -83,9 +90,11 @@ Helped with the parser token and grammar definition. Helped with symbol table ge
 Guilherme Amaro:
 Helped with the grammar definitions
 
+
 ### PROS: 
 
 Uses the visitor pattern for recursively processing the syntax tree, allowing for making passes for different purposes (symbol table, smenatic, code generation) isolated and more maintainable.
+
 
 ### CONS: 
 
