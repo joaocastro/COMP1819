@@ -9,73 +9,81 @@ public class Bytecodes {
 
 	private static SymbolTable symbolTable;
 	private static PrintWriter writer;
+	private static Node rootNode;
 	private static ArrayList<String> register_variables = new ArrayList<>();
-	private static int stack = 0;
-	private static int locals = 0;
 
-	public static void main(String args[]) throws ParseException, IOException {
-
-	}
 
 	public static void generateJavaBytecodes(Node root, SymbolTable st) throws IOException {
 		symbolTable = st;
+		rootNode = root;
+		
 		String dirName = "bin/generatedFiles";
 		File dir = new File(dirName);
 		if (!dir.exists())
 			dir.mkdir();
 
-		String fileName = ((SimpleNode) root).jjtGetValue() + ".j";
+		String fileName = ((SimpleNode) rootNode).jjtGetValue() + ".j";
 		File jFile = new File(dirName + "/" + fileName);
 		FileOutputStream jFileOS = new FileOutputStream(jFile);
 		writer = new PrintWriter(jFileOS);
 
-		moduleJavaBytecodes(root);
+		moduleJavaBytecodes();
 	}
 
-	private static void moduleJavaBytecodes(Node root) {
+	private static void moduleJavaBytecodes() {
 
-		ByteArrayOutputStream clinitBuffer = new ByteArrayOutputStream();
-		PrintWriter clinitWriter = new PrintWriter(clinitBuffer);
-
-		writer.println(".class public " + ((SimpleNode) root).jjtGetValue());
+		writer.println(".class public " + ((SimpleNode) rootNode).jjtGetValue());
 		writer.println(".super java/lang/Object\n");
 
-		int numChildren = root.jjtGetNumChildren();
-		for (int i = 0; i < numChildren; i++) {
-			// TODO - Tratar dos filhos
+		clinitJavaBytecodes();
+		for(SymbolTable table : symbolTable.getChildren().values()) {
+			if(table.getName().equals("main")) {
+				printMainMethod(table);
+			} else {
+
+			}
+			writer.println();
 		}
-		clinitWriter.close();
-		clinitJavaBytecodes(clinitBuffer.toString());
 
 		writer.close();
 	}
 
-	private static void clinitJavaBytecodes(String content) {
-
+	private static void clinitJavaBytecodes() {
 		writer.println(".method static public <clinit>()V");
-		writer.println(".limit stack " + stack);
-		writer.println(".limit locals " + register_variables.indexOf(null));
-		writer.println(content);
-		writer.println("return");
-		writer.println(".end method ");
+
+		printStack(1);
+		printLocals(1);
+
+		writer.println("\treturn");
+		writer.println(".end method");
 	}
 
-	private static void printStack() {
-
-		writer.println(".limit stack " + stack);
+	private static void printStack(int stack) {
+		writer.println("\t.limit stack " + stack);
 	}
 
-	private static void printLocals() {
-
-		writer.println(".limit locals " + locals);
+	private static void printLocals(int locals) {
+		writer.println("\t.limit locals " + locals);
 	}
+
+
+    public static void printMainMethod(SymbolTable table) {
+        writer.println(".method public static main([Ljava/lang/String;)V");
+		printStack(table.getLocals().size() * 4); // Assuming each type is of size 4
+		writer.println("\treturn");
+
+		writer.println(".end method");
+    }
+
+	public static void printMethod(SymbolTable table) {
+
+    }
 
 	/*
 	 * Handling each possible output from grammar
 	 */
 
 	private static void elseJavaByteCodes(SimpleNode elseNode, int loop) {
-
 		writer.println();
 		writer.println("goto loop" + loop + "_next");
 		writer.println("loop" + loop + "_end:");
@@ -85,7 +93,6 @@ public class Bytecodes {
 	}
 
 	private static String loadInteger(Integer value) {
-
 		if (value >= 0 && value <= 5)
 			return "iconst_" + value;
 		else if (value >= -128 && value <= 127)
@@ -97,17 +104,23 @@ public class Bytecodes {
 	}
 
 	private static String loadString(String value) {
-
 		return "ldc " + value;
 	}
 
-	private static void methodDecl(Node method) {
+	private static void mainDecl() {
+		writer.println(".method public static main([Ljava/lang/String;)V");
+		printStack(1);
+		printLocals(1);	
 
+		statementDecl();
+	}
+
+	private static void methodDecl(Node method) {
 		writer.println(".method " + ((SimpleNode) method.jjtGetChild(0).jjtGetChild(0)).getVal() + " " + ((SimpleNode) method.jjtGetChild(1)).getVal());
-		stack = 1; // ?  
-		locals = 1; // ?
-		printStack();
-		printLocals();	
+		int stack = 1; // ?  
+		int locals = 1; // ?
+		printStack(stack);
+		printLocals(locals);
 
 		statementDecl();
 	}

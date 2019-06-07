@@ -28,6 +28,8 @@ public class SymbolTable implements Cloneable {
 
   public LinkedHashMap<String, Symbol> getLocals() { return this.locals; }
 
+  public LinkedHashMap<String, SymbolTable> getChildren() { return this.children; }
+
   public Symbol lookup(String name) {
     for (Symbol s : this.params.values())
       if (s.equals(name))

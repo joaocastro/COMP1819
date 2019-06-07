@@ -1,3 +1,4 @@
 # Generated class files
 *.class
 !src/io.class
+*.j

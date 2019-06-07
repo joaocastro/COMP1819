@@ -44,7 +44,7 @@ public class jmm {
       System.out.println("performing semantic analysis...");
       perform_semantic_analysis(root);
 
-	  // Generate code
+	    // Generate code
       file_name = file_name.substring(file_name.indexOf('/') + 1, file_name.indexOf('.'));
       root.jjtSetValue(file_name);
       Bytecodes.generateJavaBytecodes(root, root_symbol_table);
