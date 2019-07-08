@@ -20,7 +20,7 @@ Given a file written in Java--, the compiler will generate ASCII descriptions of
 Several shell scripts are made available to make bootstrapping and running the compiler easier.
 
 - `compile.sh`: compiles all necessary source files. They are compiled into the `bin/` directory.
-- `clean.sh` : removes all `.class` files, anywhere in the project.
+- `clean.sh` : removes all `.class` and `.j` files, anywhere in the project.
 - `run.sh` : if the compiler was built, this can be used to compile a given a `.jmm` file into a `.j` file. These files are placed in the `gen/` directory.
 - `run_all.sh` : runs the above procedure for every single `.jmm` file inside the test suite.
 - `gen_class.sh` : calls Jasmin on a given `.j` file to generate a class file. The class file is placed in `gen/`.

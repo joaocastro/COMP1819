@@ -7,7 +7,6 @@
 import AST.*;
 import Generation.*;
 import Symbol.*;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -50,16 +49,9 @@ public class jmm {
       System.out.println("performing semantic analysis...");
       perform_semantic_analysis(root);
 
-      System.out.println(file_name);
-
       // Generate code
-      file_name = file_name.substring(file_name.lastIndexOf('/') + 1,
-                                      file_name.lastIndexOf('.'));
-
-
-      root.jjtSetValue(file_name);
-      Codegen.generateJavaCodegen(root, root_symbol_table);
-
+      System.out.println("generating code...");
+      generate_code(root);
     } catch (ParseException e) {
       System.out.println("Error parsing.");
       System.out.println(e.getMessage());
@@ -87,6 +79,17 @@ public class jmm {
 
     // Go through tree and build symbol table
     root.jjtAccept(visitor, (Object)root_symbol_table);
+  }
+
+  public void generate_code(SimpleNode root) throws IOException {
+    // Get the given file's name (class name)
+    file_name = file_name.substring(file_name.lastIndexOf('/') + 1,
+                                    file_name.lastIndexOf('.'));
+    root.jjtSetValue(file_name);
+
+    // Generate code
+    Codegen codeGenerator = new Codegen(root, root_symbol_table);
+    codeGenerator.generateCode();
   }
 
   public static InputStream read_input_file(String inputFile)
