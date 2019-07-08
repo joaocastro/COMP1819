@@ -39,7 +39,6 @@ variables (in current or parent scopes).
 
 The symbol table construction and semantic analysis are done using the [visitor pattern][visitor].
 
-
 ### INTERMEDIATE REPRESENTATIONS (IRs): 
 
 No intermediate representation was created. The code generation is done via just the syntax tree and the symbol table.
@@ -53,7 +52,7 @@ Code generation is capable of creating a `.j` file that can be interpreted by Ja
 The approach taken was relatively straight-forward and conventional.
 The visitor pattern is used for processing the tree for symbol table generation and semantic analysis, whereas a *regular* "children-iterator" approach is taken for code generation. 
 
-The starting point of the application is in `src/jmm.java`, with all of the parser logic located in `src/Parser.jjt`.
+The starting point of the application is in `src/jmm/jmm.java`. 
 
 ### TASK DISTRIBUTION: 
 
