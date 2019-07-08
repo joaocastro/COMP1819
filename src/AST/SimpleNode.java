@@ -57,6 +57,10 @@ class SimpleNode implements Node {
   public void jjtSetValue(Object value) { this.value = value; }
   public Object jjtGetValue() { return value; }
 
+  public Object getValue() {
+    return value;
+  }
+
   public String getVal() {
     return val;
   }
