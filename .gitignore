@@ -1,4 +1,14 @@
-# Generated class files
+# Compiled class files
 *.class
-!src/io.class
+
+# Jasmin class description files
 *.j
+
+# jj files
+*.jj
+
+# Log files
+*.log
+
+# Generated stuff
+bin/

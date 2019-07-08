@@ -1,23 +1,26 @@
-package Jasmin;
+package Generation;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.io.*;
 
 import AST.*;
 import Symbol.*;
-import java.io.*;
-import java.util.ArrayList;
 
-public class Bytecodes {
-
+public class Codegen {
 	private static SymbolTable symbolTable;
 	private static PrintWriter writer;
 	private static Node rootNode;
 	private static ArrayList<String> register_variables = new ArrayList<>();
 
-
-	public static void generateJavaBytecodes(Node root, SymbolTable st) throws IOException {
+	public static void generateJavaCodegen(Node root, SymbolTable st) throws IOException {
 		symbolTable = st;
 		rootNode = root;
 		
-		String dirName = "bin/generatedFiles";
+		String dirName = "../gen";
 		File dir = new File(dirName);
 		if (!dir.exists())
 			dir.mkdir();
@@ -27,15 +30,15 @@ public class Bytecodes {
 		FileOutputStream jFileOS = new FileOutputStream(jFile);
 		writer = new PrintWriter(jFileOS);
 
-		moduleJavaBytecodes();
+		moduleJavaCodegen();
 	}
 
-	private static void moduleJavaBytecodes() {
+	private static void moduleJavaCodegen() {
 
 		writer.println(".class public " + ((SimpleNode) rootNode).jjtGetValue());
 		writer.println(".super java/lang/Object\n");
 
-		clinitJavaBytecodes();
+		clinitJavaCodegen();
 		for(SymbolTable table : symbolTable.getChildren().values()) {
 			if(table.getName().equals("main")) {
 				printMainMethod(table);
@@ -48,7 +51,7 @@ public class Bytecodes {
 		writer.close();
 	}
 
-	private static void clinitJavaBytecodes() {
+	private static void clinitJavaCodegen() {
 		writer.println(".method static public <clinit>()V");
 
 		printStack(1);
@@ -83,7 +86,7 @@ public class Bytecodes {
 	 * Handling each possible output from grammar
 	 */
 
-	private static void elseJavaByteCodes(SimpleNode elseNode, int loop) {
+	private static void elseJavaCodegen(SimpleNode elseNode, int loop) {
 		writer.println();
 		writer.println("goto loop" + loop + "_next");
 		writer.println("loop" + loop + "_end:");

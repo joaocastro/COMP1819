@@ -5,9 +5,14 @@
  */
 
 import AST.*;
+import Generation.*;
 import Symbol.*;
-import java.io.*;
-import Jasmin.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class jmm {
   private static String file_name = "null";
@@ -15,15 +20,16 @@ public class jmm {
 
   public static void main(String args[]) throws ParseException, IOException {
     try {
-		file_name = args[0];
-      
+      file_name = args[0];
+
       InputStream parserStream = read_input_file(file_name);
 
       Parser parser = new Parser(parserStream);
-      
+
       new jmm(parser);
     } catch (FileNotFoundException e) {
-      System.out.println("File does not exist.");
+      System.out.println("Error with file.");
+      System.out.println(e.getMessage());
       return;
     }
   }
@@ -44,11 +50,16 @@ public class jmm {
       System.out.println("performing semantic analysis...");
       perform_semantic_analysis(root);
 
-	    // Generate code
-      file_name = file_name.substring(file_name.indexOf('/') + 1, file_name.indexOf('.'));
+      System.out.println(file_name);
+
+      // Generate code
+      file_name = file_name.substring(file_name.lastIndexOf('/') + 1,
+                                      file_name.lastIndexOf('.'));
+
+
       root.jjtSetValue(file_name);
-      Bytecodes.generateJavaBytecodes(root, root_symbol_table);
-				
+      Codegen.generateJavaCodegen(root, root_symbol_table);
+
     } catch (ParseException e) {
       System.out.println("Error parsing.");
       System.out.println(e.getMessage());
@@ -65,7 +76,7 @@ public class jmm {
     SymbolVisitor visitor = new SymbolVisitor();
 
     // Go through tree and build symbol table
-    root.jjtAccept(visitor, (Object) root_symbol_table);
+    root.jjtAccept(visitor, (Object)root_symbol_table);
 
     // Print contents of symbol table
     root_symbol_table.show("");
@@ -75,10 +86,11 @@ public class jmm {
     SemanticVisitor visitor = new SemanticVisitor();
 
     // Go through tree and build symbol table
-    root.jjtAccept(visitor, (Object) root_symbol_table);
+    root.jjtAccept(visitor, (Object)root_symbol_table);
   }
 
-  public static InputStream read_input_file(String inputFile) throws IOException {
+  public static InputStream read_input_file(String inputFile)
+      throws IOException {
     File initialFile = new File(inputFile);
     InputStream targetStream = new FileInputStream(initialFile);
     return targetStream;

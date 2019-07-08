@@ -8,7 +8,6 @@ options {
 	LOOKAHEAD=1;
 	MULTI=true;
 	VISITOR=true;
-	JJTREE_OUTPUT_DIRECTORY = "AST";
 }
 
 PARSER_BEGIN(Parser)

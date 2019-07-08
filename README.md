@@ -1,52 +1,35 @@
 # jmm (group 65)
 
-NAME1: Guilherme Vale, NR: 201709049, GRADE: 13, CONTRIBUTION: 35%
+NAME1: Guilherme Vale, NR: 201709049, GRADE: 14, CONTRIBUTION: 55%
 
-NAME2: João Pedro Castro, NR: 201404896, GRADE: 12, CONTRIBUTION: 30%
+NAME2: João Pedro Castro, NR: 201404896, GRADE: 11, CONTRIBUTION: 20%
 
-NAME3: Miguel Pedrosa, NR: 201604343, GRADE: 12, CONTRIBUTION: 30%
+NAME3: Miguel Pedrosa, NR: 201604343, GRADE: 11, CONTRIBUTION: 20%
 
 NAME4: Guilherme Amaro, NR: 201508537, GRADE: 9, CONTRIBUTION: 5%
 
-
 ## GLOBAL Grade of the project: 13
-
 
 ### SUMMARY: 
 
 A compiler of Java-- ([MiniJava][minijava]) programs to Java bytecode. 
-Given a file written in Java--, the compiler will generate ASCII descriptions of the Java classes
-in the file, written in an assembler-like syntax, which can be fed to [Jasmin][jasmin] to create 
-binary Java class files.
-
+Given a file written in Java--, the compiler will generate ASCII descriptions of the Java classes in the file, written in an assembler-like syntax, which can be fed to [Jasmin][jasmin] to create binary Java class files.
 
 ### EXECUTE: 
 
-In the `src/` directory, generate the compiler (with [JavaCC][javacc] and [JJTree][jjtree]) with
-```
-# inside src/
-jjtree Parser.jjt
-cd AST/
-javacc Parser.jj
-cd ..
-javac jmm.java
-```
-To use the built compiler, run
-```
-java jmm <input_file.jmm>
-```
+Several shell scripts are made available to make bootstrapping and running the compiler easier.
 
-A `Makefile` is made available which speeds up the building process. Running `make`, followed by `make run` in the root 
-should run the sequence of steps outlined above.
+- `compile.sh`: compiles all necessary source files. They are compiled into the `bin/` directory.
+- `clean.sh` : removes all `.class` files, anywhere in the project.
+- `run.sh` : if the compiler was built, this can be used to compile a given a `.jmm` file into a `.j` file. These files are placed in the `gen/` directory.
+- `run_all.sh` : runs the above procedure for every single `.jmm` file inside the test suite.
+- `gen_class.sh` : calls Jasmin on a given `.j` file to generate a class file. The class file is placed in `gen/`.
 
-A suite of example Java-- files is included in `src/test/`, for the sake of convenience.
-
+A suite of example files is included in `test/`, for the sake of convenience.
 
 ### DEALING WITH SYNTACTIC ERRORS: 
 
-The compiler will exit early if it detects a token not found in the defined grammar. The compiler only handles 
-errors for `while` loop conditions. It treats this sort of error by skipping to the next opening bracket.
-
+The compiler will exit early if it detects a token not found in the defined grammar. The compiler only handles errors for `while` loop conditions. It treats this sort of error by skipping to the next opening bracket.
 
 ### SEMANTIC ANALYSIS: 
 
@@ -61,11 +44,9 @@ The symbol table construction and semantic analysis are done using the [visitor 
 
 No intermediate representation was created. The code generation is done via just the syntax tree and the symbol table.
 
-
 ### CODE GENERATION: 
 
-Code generation is capable of launching a .j file that can be interpreted by Jasmin. It can't convert every information read from the symbol table, but can create the basic structure of the language and some other data
-
+Code generation is capable of creating a `.j` file that can be interpreted by Jasmin. It can't convert every information read from the symbol table, but can create the basic structure of the language and some other data.
 
 ## OVERVIEW: 
 
@@ -74,32 +55,32 @@ The visitor pattern is used for processing the tree for symbol table generation 
 
 The starting point of the application is in `src/jmm.java`, with all of the parser logic located in `src/Parser.jjt`.
 
-
 ### TASK DISTRIBUTION: 
 
 Guilherme Vale:
 Helped with the parser token and grammar definition. 
-Primarily wrote the syntax analysis, syntax tree and symbol table generation, and semantic analysis. Wrote most of this readme.
+Primarily wrote the syntax analysis, syntax tree and symbol table generation, and semantic analysis. 
+Wrote this readme file.
 
 João Pedro Castro:
-Helped with the parser token and grammar definition. Helped with symbol table generation. Primarily wrote the code generation.
+Helped with the parser token and grammar definition. Helped with symbol table generation. Primarily wrote the foundation of code generation.
 
 Miguel Pedrosa:
 Helped with the parser token and grammar definition. Helped with symbol table generation. Helped with code generation.
 
 Guilherme Amaro:
-Helped with the grammar definitions
-
+Helped with the grammar definitions.
 
 ### PROS: 
 
-Uses the visitor pattern for recursively processing the syntax tree, allowing for making passes for different purposes (symbol table, smenatic, code generation) isolated and more maintainable.
-
+- Uses the visitor pattern for recursively processing the syntax tree, allowing for making passes for different purposes (symbol table, smenatic, code generation) isolated and more maintainable.
 
 ### CONS: 
 
-Very rudimentary error handling, not very helpful error messages, and poor code generation support.
-No optimisations were implemented in the compiler.
+- Very rudimentary error handling.
+- Error messages could be more helpful.
+- Poor code generation support. 
+- No optimisations were implemented.
 
 [minijava]: http://www.cs.tufts.edu/~sguyer/classes/comp181-2006/minijava.html
 [javacc]: https://javacc.org/
