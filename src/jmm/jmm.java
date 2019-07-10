@@ -44,14 +44,17 @@ public class jmm {
       // Build symbol table
       System.out.println("building symbol table...");
       build_symbol_table(root);
+      System.out.println("done building symbol table.");
 
       // Perform semantic analysis
       System.out.println("performing semantic analysis...");
       perform_semantic_analysis(root);
+      System.out.println("done performing semantic analysis.");
 
       // Generate code
       System.out.println("generating code...");
       generate_code(root);
+      System.out.println("done generating code.");
     } catch (ParseException e) {
       System.out.println("Error parsing.");
       System.out.println(e.getMessage());

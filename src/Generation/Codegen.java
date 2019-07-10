@@ -16,14 +16,13 @@ public class Codegen {
   private SymbolTable symbolTable;
 
   private PrintWriter out;
-
   private StringBuilder builder;
 
   private ArrayList<String> register_variables = new ArrayList<>();
 
   public Codegen(SimpleNode root, SymbolTable st) throws IOException {
-    root = root;
-    symbolTable = st;
+    this.root = root;
+    this.symbolTable = st;
 
     String filename = root.getValue() + ".j";
 
@@ -36,38 +35,38 @@ public class Codegen {
 
       FileWriter fw = new FileWriter(dirname + "/" + filename, false);
       BufferedWriter bw = new BufferedWriter(fw);
-      out = new PrintWriter(bw);
-
+      
+      this.builder = new StringBuilder();
+      this.out = new PrintWriter(bw);
     } catch (IOException e) {
       System.out.println("Error with i/o.");
       System.out.println(e.getMessage());
     }
-
-    builder = new StringBuilder();
   }
 
-  public void generateCode() {
+  public String generateCode() {
     generateHeader();
     generateGlobals();
     generateStatic();
     generateFunctions();
+    
+    System.out.println(this.builder);
+    this.out.println(this.builder);
+    this.out.close();
 
-    out.println(builder);
-    out.close();
-
-    moduleJavaCodegen();
+    return this.builder.toString();
   }
 
   private void appendln(String content) {
-    builder.append(content);
-    builder.append("\n");
+    this.builder.append(content);
+    this.builder.append("\n");
   }
 
-  private void appendln() { builder.append("\n"); }
+  private void appendln() { this.builder.append("\n"); }
 
   private void generateHeader() {
-    appendln(".class public " + root.getValue());
-    appendln(".super java/lang/Object"
+    this.appendln(".class public " + root.getValue());
+    this.appendln(".super java/lang/Object"
              + "\n");
 
     moduleJavaCodegen();
@@ -80,53 +79,47 @@ public class Codegen {
   private void generateFunctions() {}
 
   private void moduleJavaCodegen() {
+    this.appendln(".method static public <clinit>()V");
 
-    clinitJavaCodegen();
+    this.printStack(1);
+    this.printLocals(1);
+
+    this.appendln(TAB + "return");
+    this.appendln(".end method");
+
     for (SymbolTable table : symbolTable.getChildren().values()) {
       if (table.getName().equals("main")) {
-        printMainMethod(table);
+        this.printMainMethod(table);
       } else {
       }
-      appendln();
+      this.appendln();
     }
-
-    out.close();
   }
 
-  private void clinitJavaCodegen() {
-    appendln(".method static public <clinit>()V");
-
-    printStack(1);
-    printLocals(1);
-
-    appendln("\treturn");
-    appendln(".end method");
-  }
-
-  private void printStack(int stack) { appendln("\t.limit stack " + stack); }
+  private void printStack(int stack) { this.appendln(TAB + ".limit stack " + stack); }
 
   private void printLocals(int locals) {
-    appendln("\t.limit locals " + locals);
+    this.appendln(TAB + ".limit locals " + locals);
   }
 
   public void printMainMethod(SymbolTable table) {
-    appendln(".method public static main([Ljava/lang/String;)V");
-    printStack(table.getLocals().size() * 4); // Assuming each type is of size 4
-    appendln("\treturn");
+    this.appendln(".method public static main([Ljava/lang/String;)V");
+    this.printStack(table.getLocals().size() * 4); // Assuming each type is of size 4
+    this.appendln(TAB + "return");
 
-    appendln(".end method");
+    this.appendln(".end method");
   }
 
   private void elseJavaCodegen(SimpleNode elseNode, int loop) {
-    appendln();
-    appendln("goto loop" + loop + "_next");
-    appendln("loop" + loop + "_end:");
+    this.appendln();
+    this.appendln("goto loop" + loop + "_next");
+    this.appendln("loop" + loop + "_end:");
     // TODO: Pode ser recursivo
-    appendln();
-    appendln("loop" + loop + "_next:");
+    this.appendln();
+    this.appendln("loop" + loop + "_next:");
   }
 
-  private String loadInteger(Integer value) {
+  private String loadInteger(int value) {
     if (value >= 0 && value <= 5)
       return "iconst_" + value;
     else if (value >= -128 && value <= 127)
@@ -138,13 +131,12 @@ public class Codegen {
   }
 
   private void methodDecl(Node method) {
-    appendln(".method " +
+    this.appendln(".method " +
              ((SimpleNode)method.jjtGetChild(0).jjtGetChild(0)).getVal() + " " +
              ((SimpleNode)method.jjtGetChild(1)).getVal());
     int stack = 1;  // ?
     int locals = 1; // ?
-    printStack(stack);
-    printLocals(locals);
-
+    this.printStack(stack);
+    this.printLocals(locals);
   }
 }

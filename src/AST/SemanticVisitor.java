@@ -43,7 +43,7 @@ public class SemanticVisitor implements ParserVisitor {
     if (node.jjtGetChild(0) instanceof ASTId) {
       String id = ((SimpleNode)node.jjtGetChild(0)).getVal();
       Symbol sym = st.lookup(id);
-      
+
       if (sym != null)
         if (sym.getInit() == false)
           System.err.println(
