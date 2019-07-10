@@ -25,7 +25,7 @@ Several shell scripts are made available to make bootstrapping and running the c
 - `run_all.sh` : runs the above procedure for every single `.jmm` file inside the test suite.
 - `gen_class.sh` : calls Jasmin on a given `.j` file to generate a class file. The class file is placed in `gen/`.
 
-A suite of example files is included in `test/`, for the sake of convenience.
+A suite of example files is included in `test/`.
 
 ### DEALING WITH SYNTACTIC ERRORS: 
 
@@ -45,7 +45,10 @@ No intermediate representation was created. The code generation is done via just
 
 ### CODE GENERATION: 
 
-Code generation is capable of creating a `.j` file that can be interpreted by Jasmin. It can't convert every information read from the symbol table, but can create the basic structure of the language and some other data.
+Code generation naturally creates a `.j`file which can be used via Jasmin (and the `gen_class` shell script) to create a Java classfile. The code generation supports:
+
+- Class extension (`extends` keyword)
+- Global variables
 
 ## OVERVIEW: 
 

@@ -12,6 +12,13 @@ class ASTClass extends SimpleNode {
     super(p, id);
   }
 
+  public String getExtends() {
+    for (Node n : this.children)
+      if (n instanceof ASTExtends)
+        return ((SimpleNode) n).getVal().toString();
+
+    return "";
+  }
 
   /** Accept the visitor. **/
   public Object jjtAccept(ParserVisitor visitor, Object data) {

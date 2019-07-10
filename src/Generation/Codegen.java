@@ -18,10 +18,11 @@ public class Codegen {
   private PrintWriter out;
   private StringBuilder builder;
 
-  private ArrayList<String> register_variables = new ArrayList<>();
+  private boolean o_flag = false;
 
   public Codegen(SimpleNode root, SymbolTable st) throws IOException {
-    this.root = root;
+    this.root =
+        (SimpleNode)root.jjtGetChildren()[0]; // class declaration is root
     this.symbolTable = st;
 
     String filename = root.getValue() + ".j";
@@ -35,7 +36,7 @@ public class Codegen {
 
       FileWriter fw = new FileWriter(dirname + "/" + filename, false);
       BufferedWriter bw = new BufferedWriter(fw);
-      
+
       this.builder = new StringBuilder();
       this.out = new PrintWriter(bw);
     } catch (IOException e) {
@@ -44,99 +45,71 @@ public class Codegen {
     }
   }
 
-  public String generateCode() {
+  public void generateCode() {
     generateHeader();
     generateGlobals();
+
     generateStatic();
     generateFunctions();
-    
-    System.out.println(this.builder);
+
+    // Write to file
     this.out.println(this.builder);
     this.out.close();
-
-    return this.builder.toString();
   }
 
+  private void appendln() { this.builder.append("\n"); }
   private void appendln(String content) {
     this.builder.append(content);
     this.builder.append("\n");
   }
 
-  private void appendln() { this.builder.append("\n"); }
-
   private void generateHeader() {
     this.appendln(".class public " + root.getValue());
-    this.appendln(".super java/lang/Object"
-             + "\n");
+    if (!((ASTClass)this.root).getExtends().equals(""))
+      this.appendln(".super " + ((ASTClass)this.root).getExtends());
+    else
+      this.appendln(".super java/lang/Object");
 
-    moduleJavaCodegen();
+    this.appendln();
   }
 
-  private void generateGlobals() {}
+  private void generateGlobals() {
+    for (Node n : root.jjtGetChildren())
+      if (n instanceof ASTVariable)
+        genVarGlobal((ASTVariable)n);
+
+    appendln();
+  }
 
   private void generateStatic() {}
 
   private void generateFunctions() {}
 
-  private void moduleJavaCodegen() {
-    this.appendln(".method static public <clinit>()V");
+  private void genVarGlobal(ASTVariable vardecl) {
+    String name = vardecl.getVal().toString();
+    String type = parseReturnType(
+        ((SimpleNode)vardecl.jjtGetChildren()[0]).getVal().toString());
 
-    this.printStack(1);
-    this.printLocals(1);
+    if (name.equals("field"))
+      name = "'field'";
 
-    this.appendln(TAB + "return");
-    this.appendln(".end method");
+    appendln(".field private " + name + " " + type);
+  }
 
-    for (SymbolTable table : symbolTable.getChildren().values()) {
-      if (table.getName().equals("main")) {
-        this.printMainMethod(table);
-      } else {
-      }
-      this.appendln();
+  private String parseReturnType(String type) {
+    switch (type) {
+    case "int":
+      return "I";
+    case "int[]":
+      return "[I";
+    case "boolean":
+      return "Z";
+    case "void":
+      return "V";
+    case "":
+      return "V";
+    default:
+      return "L" + type + ";";
     }
-  }
-
-  private void printStack(int stack) { this.appendln(TAB + ".limit stack " + stack); }
-
-  private void printLocals(int locals) {
-    this.appendln(TAB + ".limit locals " + locals);
-  }
-
-  public void printMainMethod(SymbolTable table) {
-    this.appendln(".method public static main([Ljava/lang/String;)V");
-    this.printStack(table.getLocals().size() * 4); // Assuming each type is of size 4
-    this.appendln(TAB + "return");
-
-    this.appendln(".end method");
-  }
-
-  private void elseJavaCodegen(SimpleNode elseNode, int loop) {
-    this.appendln();
-    this.appendln("goto loop" + loop + "_next");
-    this.appendln("loop" + loop + "_end:");
-    // TODO: Pode ser recursivo
-    this.appendln();
-    this.appendln("loop" + loop + "_next:");
-  }
-
-  private String loadInteger(int value) {
-    if (value >= 0 && value <= 5)
-      return "iconst_" + value;
-    else if (value >= -128 && value <= 127)
-      return "bipush " + value;
-    else if (value >= -32768 && value <= 32767)
-      return "sipush " + value;
-    else
-      return "ldc " + value;
-  }
-
-  private void methodDecl(Node method) {
-    this.appendln(".method " +
-             ((SimpleNode)method.jjtGetChild(0).jjtGetChild(0)).getVal() + " " +
-             ((SimpleNode)method.jjtGetChild(1)).getVal());
-    int stack = 1;  // ?
-    int locals = 1; // ?
-    this.printStack(stack);
-    this.printLocals(locals);
   }
 }
