@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class Codegen {
   private static String TAB = "\t";
 
-  private SimpleNode root;
+  private ASTClass root;
   private SymbolTable symbolTable;
 
   private PrintWriter out;
@@ -20,12 +20,12 @@ public class Codegen {
 
   private boolean o_flag = false;
 
-  public Codegen(SimpleNode root, SymbolTable st) throws IOException {
-    this.root =
-        (SimpleNode)root.jjtGetChildren()[0]; // class declaration is root
+  public Codegen(ASTClass root, SymbolTable st) throws IOException {
+    // class declaration is root
+    this.root = root;
     this.symbolTable = st;
 
-    String filename = root.getValue() + ".j";
+    String filename = this.root.getClassName() + ".j";
 
     try {
       // Create gen folder if it doesn't exist
@@ -46,7 +46,7 @@ public class Codegen {
   }
 
   public void generateCode() {
-    generateHeader();
+    generateClass();
     generateGlobals();
 
     generateInit();
@@ -63,10 +63,11 @@ public class Codegen {
     this.builder.append("\n");
   }
 
-  private void generateHeader() {
-    this.appendln(".class public " + root.getValue());
-    if (!((ASTClass)this.root).getExtends().equals(""))
-      this.appendln(".super " + ((ASTClass)this.root).getExtends());
+  private void generateClass() {
+    this.appendln(".class public " + this.root.getClassName());
+
+    if (!this.root.getExtends().equals(""))
+      this.appendln(".super " + this.root.getExtends());
     else
       this.appendln(".super java/lang/Object");
 
@@ -81,19 +82,102 @@ public class Codegen {
     appendln();
   }
 
-  private void generateInit() {}
+  private void generateInit() {
+    appendln(".method public <init>()V");
+    appendln(TAB + "aload_0");
 
-  private void generateMethods() {}
+    if (!this.root.getExtends().equals(""))
+      appendln(TAB + "invokespecial " + this.root.getExtends() + "/<init>()V");
+    else
+      appendln(TAB + "invokespecial java/lang/Object/<init>()V");
 
-  private void generateGlobalVar(ASTVariable vardecl) {
-    String name = vardecl.getVal().toString();
-    String type = parseType(
-        ((SimpleNode)vardecl.jjtGetChildren()[0]).getVal().toString());
+    appendln(TAB + "return");
+    appendln(".end method");
+  }
+
+  private void generateMethods() {
+    for (Node n : root.jjtGetChildren())
+      if (n instanceof ASTMain || n instanceof ASTMethod)
+        generateMethod((SimpleNode)n);
+  }
+
+  private void generateMethod(SimpleNode method) {
+    StackController stack = new StackController();
+
+    generateMethodSignature(method);
+    generateMethodBody(method, stack);
+    generateMethodFooter(method, stack);
+
+    System.out.println("Current max stack: " + stack.getMaxStack());
+
+    // String methodName = "";
+    // if (method instanceof ASTMethod)
+    //   methodName = ((ASTMethod)method).getMethodName();
+    // else
+    //   methodName = "mainString[]";
+
+    // writeStackLimit(methodName, stack);
+  }
+
+  private void generateMethodSignature(SimpleNode methodNode) {
+    appendln();
+
+    // ASTMain
+    if (methodNode instanceof ASTMain) {
+      appendln(".method public static main([Ljava/lang/String;)V");
+      return;
+    }
+
+    // ASTMethod
+    ASTMethod method = (ASTMethod)methodNode;
+    String identifier = method.getMethodName();
+    String type = method.getMethodType();
+    ASTMethodParams methodParams = method.getMethodParams();
+
+    String params = "";
+
+    // if method has params
+    if (methodParams != null) {
+      // TODO: for every param in methodParams, add method params to params string
+      // for (int i = 0; i < ((SimpleNode)
+      // method.).jjtGetNumChildren(); i++) {
+      //   ASTMethodParam argNode = (ASTMethodParam) ((SimpleNode)
+      //   method.jjtGetChild(0)).jjtGetChild(i);
+      //    params += convertType(argNode.getType());
+      // }
+    }
+
+    appendln(".method public " + identifier + "(" + params + ")" +
+             convertType(type));
+  }
+
+  private void generateMethodBody(SimpleNode method, StackController stack) {}
+
+  private void generateMethodFooter(SimpleNode method, StackController stack) {}
+
+  private void generateGlobalVar(ASTVariable varDecl) {
+    String name = varDecl.getVarName();
+    String type = parseType(varDecl.getVarType());
 
     if (name.equals("field"))
       name = "'field'";
 
     appendln(".field private " + name + " " + type);
+  }
+
+  private String convertType(String type) {
+    switch (type) {
+    case "int":
+      return "I";
+    case "int[]":
+      return "[I";
+    case "boolean":
+      return "Z";
+    case "void":
+      return "V";
+    default:
+      return "";
+    }
   }
 
   private String parseType(String type) {
@@ -110,6 +194,49 @@ public class Codegen {
       return "V";
     default:
       return "L" + type + ";";
+    }
+  }
+
+  private void parseNumber(int value, StackController stack) {
+    if (value <= 5) {
+      stack.addInstruction(Instructions.ICONST, 0);
+      appendln(TAB + TAB + "iconst_" + value);
+      return;
+    }
+
+    if (value <= 127) {
+      stack.addInstruction(Instructions.BIPUSH, 0);
+      appendln(TAB + TAB + "bipush " + value);
+      return;
+    }
+
+    if (value <= 32767) {
+      stack.addInstruction(Instructions.SIPUSH, 0);
+      appendln(TAB + TAB + "sipush " + value);
+      return;
+    }
+
+    stack.addInstruction(Instructions.LDC, 0);
+    appendln(TAB + TAB + "ldc " + value);
+  }
+
+  private void writeStackLimit(String methodName, StackController stack) {
+    try {
+      File dir = new File("gen");
+      if (!dir.exists())
+        dir.mkdirs();
+
+      File file = new File("gen/" + this.root.getClassName() + ".j");
+      if (!file.exists())
+        file.createNewFile();
+
+      int index = this.builder.indexOf("stack_" + methodName);
+      // FIXME: error in this line
+      this.builder.replace(index, index + methodName.length() + 6,
+                           "stack " + stack.getMaxStack()); // 6 - "stack_"
+
+    } catch (IOException e) {
+      System.out.println(e.getMessage());
     }
   }
 }

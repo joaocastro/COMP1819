@@ -12,6 +12,14 @@ class ASTVariable extends SimpleNode {
     super(p, id);
   }
 
+  public String getVarName() {
+    return this.getVal().toString();
+  }
+
+  public String getVarType() {
+    return ((SimpleNode) this.children[0]).getVal().toString();
+  }
+
   public void dump(String prefix) {
     System.out.println(toString(prefix) + " " + children[0].toString());
   }

@@ -12,6 +12,30 @@ class ASTMethod extends SimpleNode {
     super(p, id);
   }
 
+  public String getMethodName() {
+    for (Node n : this.children)
+      if (n instanceof ASTName)
+        return ((SimpleNode) n).getVal().toString();
+
+    return "null";
+  }
+
+  public String getMethodType() {
+    for (Node n : this.children)
+      if (n instanceof ASTReturn) {
+        return (((SimpleNode) ((SimpleNode) n).children[0]).getVal().toString());
+      }
+
+    return "null";
+  }
+
+  public ASTMethodParams getMethodParams() {
+    for (Node n : this.children)
+      if (n instanceof ASTMethodParams)
+        return (ASTMethodParams) n;
+
+    return null;
+  }
 
   /** Accept the visitor. **/
   public Object jjtAccept(ParserVisitor visitor, Object data) {

@@ -12,6 +12,14 @@ class ASTClass extends SimpleNode {
     super(p, id);
   }
 
+  public String getClassName() {
+    for (Node n : this.children)
+      if (n instanceof ASTName)
+        return ((SimpleNode) n).getVal().toString();
+
+    return "null";
+  }
+
   public String getExtends() {
     for (Node n : this.children)
       if (n instanceof ASTExtends)

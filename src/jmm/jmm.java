@@ -91,7 +91,7 @@ public class jmm {
     root.jjtSetValue(file_name);
 
     // Generate code
-    Codegen codeGenerator = new Codegen(root, root_symbol_table);
+    Codegen codeGenerator = new Codegen((ASTClass) root.jjtGetChildren()[0], root_symbol_table);
     codeGenerator.generateCode();
   }
 
