@@ -151,7 +151,22 @@ public class Codegen {
              convertType(type));
   }
 
-  private void generateMethodBody(SimpleNode method, StackController stack) {}
+  private void generateMethodBody(SimpleNode method, StackController stack) {
+    String methodName = "";
+
+    if (method instanceof ASTMethod)
+      methodName = ((ASTMethod) method).getMethodName();
+    else
+      methodName = "mainString[]";
+
+    appendln(TAB + ".limit stack_" + methodName);
+    
+    SymbolTable functionTable = this.symbolTable.getTable(methodName);
+    if (functionTable != null)
+      appendln(TAB + ".limit locals " + functionTable.getLocals().size());
+
+    // TODO: for every statement in method, generate statement
+  }
 
   private void generateMethodFooter(SimpleNode method, StackController stack) {}
 
@@ -200,24 +215,24 @@ public class Codegen {
   private void parseNumber(int value, StackController stack) {
     if (value <= 5) {
       stack.addInstruction(Instructions.ICONST, 0);
-      appendln(TAB + TAB + "iconst_" + value);
+      appendln(TAB + "iconst_" + value);
       return;
     }
 
     if (value <= 127) {
       stack.addInstruction(Instructions.BIPUSH, 0);
-      appendln(TAB + TAB + "bipush " + value);
+      appendln(TAB + "bipush " + value);
       return;
     }
 
     if (value <= 32767) {
       stack.addInstruction(Instructions.SIPUSH, 0);
-      appendln(TAB + TAB + "sipush " + value);
+      appendln(TAB + "sipush " + value);
       return;
     }
 
     stack.addInstruction(Instructions.LDC, 0);
-    appendln(TAB + TAB + "ldc " + value);
+    appendln(TAB + "ldc " + value);
   }
 
   private void writeStackLimit(String methodName, StackController stack) {

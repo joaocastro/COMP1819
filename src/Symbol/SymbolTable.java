@@ -27,6 +27,8 @@ public class SymbolTable implements Cloneable {
   public LinkedHashMap<String, Symbol> getParams() { return this.params; }
 
   public LinkedHashMap<String, Symbol> getLocals() { return this.locals; }
+  public int getLocalsNum() { return this.locals.size(); }
+
 
   public LinkedHashMap<String, SymbolTable> getChildren() { return this.children; }
 
@@ -43,6 +45,16 @@ public class SymbolTable implements Cloneable {
       return null;
 
     return this.parent.lookup(name);
+  }
+
+  public SymbolTable getTable(String name) {
+    if (this.name == name)
+      return this;
+
+    for (SymbolTable st : this.children.values())
+      return st.getTable(name);
+
+    return null;
   }
 
   public String getName() { return this.name; }
