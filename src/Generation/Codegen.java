@@ -49,8 +49,8 @@ public class Codegen {
     generateHeader();
     generateGlobals();
 
-    generateStatic();
-    generateFunctions();
+    generateInit();
+    generateMethods();
 
     // Write to file
     this.out.println(this.builder);
@@ -76,18 +76,18 @@ public class Codegen {
   private void generateGlobals() {
     for (Node n : root.jjtGetChildren())
       if (n instanceof ASTVariable)
-        genVarGlobal((ASTVariable)n);
+        generateGlobalVar((ASTVariable)n);
 
     appendln();
   }
 
-  private void generateStatic() {}
+  private void generateInit() {}
 
-  private void generateFunctions() {}
+  private void generateMethods() {}
 
-  private void genVarGlobal(ASTVariable vardecl) {
+  private void generateGlobalVar(ASTVariable vardecl) {
     String name = vardecl.getVal().toString();
-    String type = parseReturnType(
+    String type = parseType(
         ((SimpleNode)vardecl.jjtGetChildren()[0]).getVal().toString());
 
     if (name.equals("field"))
@@ -96,7 +96,7 @@ public class Codegen {
     appendln(".field private " + name + " " + type);
   }
 
-  private String parseReturnType(String type) {
+  private String parseType(String type) {
     switch (type) {
     case "int":
       return "I";
