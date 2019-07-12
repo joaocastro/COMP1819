@@ -132,20 +132,14 @@ public class Codegen {
     ASTMethod method = (ASTMethod)methodNode;
     String identifier = method.getMethodName();
     String type = method.getMethodType();
-    ASTMethodParams methodParams = method.getMethodParams();
+    Node[] methodParams = method.getMethodParams().jjtGetChildren();
 
     String params = "";
 
-    // if method has params
-    if (methodParams != null) {
-      // TODO: for every param in methodParams, add method params to params
-      // string for (int i = 0; i < ((SimpleNode) method.).jjtGetNumChildren();
-      // i++) {
-      //   ASTMethodParam argNode = (ASTMethodParam) ((SimpleNode)
-      //   method.jjtGetChild(0)).jjtGetChild(i);
-      //    params += convertType(argNode.getType());
-      // }
-    }
+    // For every param in methodParams, add method params to params
+    if (methodParams != null) 
+      for (Node n : methodParams)
+        params += convertType(((ASTMethodParam)n).getParamType()) + ";";
 
     appendln(".method public " + identifier + "(" + params + ")" +
              convertType(type));
@@ -175,12 +169,13 @@ public class Codegen {
     if (method instanceof ASTMain) {
       functionTable = this.symbolTable.getTable("main");
     } else {
-      functionTable = this.symbolTable.getTable(((ASTMethod)method).getMethodName());
+      functionTable =
+          this.symbolTable.getTable(((ASTMethod)method).getMethodName());
 
       if (functionTable != null)
         returnType = functionTable.getReturnType();
 
-      ASTReturnStmt returnStmt = ((ASTMethod) method).getMethodReturnStmt();
+      ASTReturnStmt returnStmt = ((ASTMethod)method).getMethodReturnStmt();
       if (returnStmt != null) {
         // TODO: generate return statement
       }
