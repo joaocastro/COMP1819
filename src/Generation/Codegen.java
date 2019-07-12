@@ -138,9 +138,9 @@ public class Codegen {
 
     // if method has params
     if (methodParams != null) {
-      // TODO: for every param in methodParams, add method params to params string
-      // for (int i = 0; i < ((SimpleNode)
-      // method.).jjtGetNumChildren(); i++) {
+      // TODO: for every param in methodParams, add method params to params
+      // string for (int i = 0; i < ((SimpleNode) method.).jjtGetNumChildren();
+      // i++) {
       //   ASTMethodParam argNode = (ASTMethodParam) ((SimpleNode)
       //   method.jjtGetChild(0)).jjtGetChild(i);
       //    params += convertType(argNode.getType());
@@ -155,12 +155,12 @@ public class Codegen {
     String methodName = "";
 
     if (method instanceof ASTMethod)
-      methodName = ((ASTMethod) method).getMethodName();
+      methodName = ((ASTMethod)method).getMethodName();
     else
       methodName = "mainString[]";
 
     appendln(TAB + ".limit stack_" + methodName);
-    
+
     SymbolTable functionTable = this.symbolTable.getTable(methodName);
     if (functionTable != null)
       appendln(TAB + ".limit locals " + functionTable.getLocals().size());
@@ -169,46 +169,47 @@ public class Codegen {
   }
 
   private void generateMethodFooter(SimpleNode method, StackController stack) {
-    
-    SymbolTable functionTable;
-    if (method.getId() == ParserTreeConstants.JJTMAIN) {
-      functionTable = SimpleNode.getSymbolTable().doesFunctionExist("main");
-    } else {
-      functionTable = SimpleNode.getSymbolTable().doesFunctionExist(((ASTMethod) method).getValue() /*getScope()*/); //qual é o scope aqui?
-    }
-
-    SimpleNode returnNode = (SimpleNode) method.jjtGetChild(method.jjtGetNumChildren()-1);
-    if (returnNode.getId() == ParserTreeConstants.JJTRETURN) {
-     // genExpression(((SimpleNode) returnNode.jjtGetChild(0)), stack); TODO - genExpression
-    }
-
     String returnType = "void";
-    if (functionTable != null) {
-      returnType = functionTable.getReturnType();
-    }
-    switch(returnType) {
-      case "int":
-        stack.addInstruction(Instructions.IRETURN, 0);
-        appendln("  ireturn");
-        break;
-      case "int[]":
-        stack.addInstruction(Instructions.ARETURN, 0);
-        appendln("  areturn"); 
-        break;
-      case "boolean":
-        stack.addInstruction(Instructions.IRETURN, 0);
-        appendln("  ireturn"); 
-        break;
-      case "void":
-        stack.addInstruction(Instructions.RETURN, 0);
-        appendln("  return");
-        break;
-      default:
-        stack.addInstruction(Instructions.ARETURN, 0);
-        appendln("  areturn");
+    SymbolTable functionTable;
 
+    if (method instanceof ASTMain) {
+      functionTable = this.symbolTable.getTable("main");
+    } else {
+      functionTable = this.symbolTable.getTable(((ASTMethod)method).getMethodName());
+
+      if (functionTable != null)
+        returnType = functionTable.getReturnType();
+
+      ASTReturnStmt returnStmt = ((ASTMethod) method).getMethodReturnStmt();
+      if (returnStmt != null) {
+        // TODO: generate return statement
+      }
     }
-    appendln(".end method\n");
+
+    switch (returnType) {
+    case "int":
+      stack.addInstruction(Instructions.IRETURN, 0);
+      appendln(TAB + "ireturn");
+      break;
+    case "int[]":
+      stack.addInstruction(Instructions.ARETURN, 0);
+      appendln(TAB + "areturn");
+      break;
+    case "boolean":
+      stack.addInstruction(Instructions.IRETURN, 0);
+      appendln(TAB + "ireturn");
+      break;
+    case "void":
+      stack.addInstruction(Instructions.RETURN, 0);
+      appendln(TAB + "return");
+      break;
+    default:
+      stack.addInstruction(Instructions.ARETURN, 0);
+      appendln(TAB + "areturn");
+    }
+
+    appendln(".end method");
+    appendln();
   }
 
   private void generateGlobalVar(ASTVariable varDecl) {

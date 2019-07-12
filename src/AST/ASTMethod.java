@@ -37,6 +37,14 @@ class ASTMethod extends SimpleNode {
     return null;
   }
 
+  public ASTReturnStmt getMethodReturnStmt() {
+    for (Node n : this.children)
+      if (n instanceof ASTReturnStmt)
+        return (ASTReturnStmt) n;
+
+    return null;
+  }
+
   /** Accept the visitor. **/
   public Object jjtAccept(ParserVisitor visitor, Object data) {
 
