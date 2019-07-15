@@ -4,12 +4,23 @@ package AST;
 
 public
 class ASTLessThan extends SimpleNode {
+  static int count = 0;
+  int labelId;
+
   public ASTLessThan(int id) {
     super(id);
+    this.labelId = count;
+    count++;
   }
 
   public ASTLessThan(Parser p, int id) {
     super(p, id);
+    this.labelId = count;
+    count++;
+  }
+
+  public int getLabelId() {
+    return this.labelId;
   }
 
   public String toString() {

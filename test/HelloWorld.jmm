@@ -3,5 +3,12 @@ class HelloWorld {
 
 	public static void main(String[] args) {
 		ioPlus.printHelloWorld();
+
+		a = a + 3;
+		a = a - 4;
+		a = a * 5;
+		a = a / 6;
+
+		a = true;
 	}
 }

@@ -49,6 +49,9 @@ Code generation naturally creates a `.j`file which can be used via Jasmin (and t
 
 - Class extension (`extends` keyword)
 - Global variables
+- Loading integer literals
+- Loading boolean literals
+- If blocks (incl else condition)
 
 ## OVERVIEW: 
 

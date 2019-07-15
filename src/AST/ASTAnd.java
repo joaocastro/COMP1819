@@ -4,14 +4,28 @@ package AST;
 
 public
 class ASTAnd extends SimpleNode {
+  static int count = 0;
+  int labelId;
+
   public ASTAnd(int id) {
     super(id);
+    this.labelId = count;
+    count++;
   }
 
   public ASTAnd(Parser p, int id) {
     super(p, id);
+    this.labelId = count;
+    count++;
   }
 
+  public int getLabelId() {
+    return this.labelId;
+  }
+
+  public String toString() {
+    return "&&";
+  }
 
   /** Accept the visitor. **/
   public Object jjtAccept(ParserVisitor visitor, Object data) {

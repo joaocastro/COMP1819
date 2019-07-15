@@ -229,7 +229,9 @@ public class Codegen {
 
   private void generateExpression(SimpleNode stmt, StackController stack) {
     if (stmt instanceof ASTId) {
-      generateIdentifier((ASTId)stmt, stack);
+      generateIdentifierLoad((ASTId)stmt, stack);
+    } else if (stmt instanceof ASTInteger) {
+      generateIntegerLoad((ASTInteger)stmt, stack);
     } else if (stmt instanceof ASTAdd) {
       generateAdd((ASTAdd)stmt, stack);
     } else if (stmt instanceof ASTSub) {
@@ -240,6 +242,10 @@ public class Codegen {
       generateDiv((ASTDiv)stmt, stack);
     } else if (stmt instanceof ASTLessThan) {
       generateLessThan((ASTLessThan)stmt, stack);
+    } else if (stmt instanceof ASTAnd) {
+      generateAnd((ASTAnd)stmt, stack);
+    } else if (stmt instanceof ASTTrue) {
+      generateTrue((ASTTrue)stmt, stack);
     } else if (stmt instanceof ASTFalse) {
       generateFalse((ASTFalse)stmt, stack);
     } else if (stmt instanceof ASTNew) {
@@ -307,7 +313,7 @@ public class Codegen {
         (ASTElse)ifStmt.jjtGetChild(ifStmt.jjtGetNumChildren() - 1);
 
     // Generate if condition
-    generateExpression(condStmt, stack);
+    generateExpression((SimpleNode)condStmt.jjtGetChild(0), stack);
 
     // Generate if body
     appendln(TAB + "ifeq ELSE_" + (ifStmt.getId()));
@@ -342,32 +348,104 @@ public class Codegen {
     appendln(".field private " + name + " " + type);
   }
 
-  private void generateIdentifier(ASTId id, StackController stack) {
+  private void generateIdentifierLoad(ASTId id, StackController stack) {
     System.out.println("found an identifier");
+  }
+
+  private void generateIntegerLoad(ASTInteger integer, StackController stack) {
+    System.out.println("found an integer literal");
+
+    int value = Integer.parseInt(integer.getVal());
+    if (value <= 5) {
+      stack.addInstruction(Instructions.ICONST, 0);
+      appendln(TAB + "iconst_" + value);
+    } else if (value <= 127) {
+      stack.addInstruction(Instructions.BIPUSH, 0);
+      appendln(TAB + "bipush " + value);
+    } else if (value <= 32767) {
+      stack.addInstruction(Instructions.SIPUSH, 0);
+      appendln(TAB + "sipush " + value);
+    } else {
+      stack.addInstruction(Instructions.LDC, 0);
+      appendln(TAB + "ldc " + value);
+    }
   }
 
   private void generateAdd(ASTAdd add, StackController stack) {
     System.out.println("found add expression");
+    generateArithmetic(add, "iadd", stack);
   }
 
   private void generateSub(ASTSub sub, StackController stack) {
     System.out.println("found sub expression");
+    generateArithmetic(sub, "isub", stack);
   }
 
   private void generateMul(ASTMul mul, StackController stack) {
     System.out.println("found mul expression");
+    generateArithmetic(mul, "imul", stack);
   }
 
-  private void generateDiv(ASTDiv mul, StackController stack) {
+  private void generateDiv(ASTDiv div, StackController stack) {
     System.out.println("found div expression");
+    generateArithmetic(div, "idiv", stack);
+  }
+
+  private void generateArithmetic(SimpleNode arithm, String op,
+                                  StackController stack) {
+    SimpleNode lhs = (SimpleNode)arithm.jjtGetChild(0);
+    SimpleNode rhs = (SimpleNode)arithm.jjtGetChild(1);
+
+    generateExpression(lhs, stack);
+    generateExpression(rhs, stack);
+
+    stack.addInstruction(Instructions.OP, 0);
+
+    appendln(TAB + op);
   }
 
   private void generateLessThan(ASTLessThan lessthan, StackController stack) {
     System.out.println("found less than expression");
+
+    SimpleNode lhs = (SimpleNode)lessthan.jjtGetChild(0);
+    SimpleNode rhs = (SimpleNode)lessthan.jjtGetChild(1);
+
+    generateExpression(lhs, stack);
+    generateExpression(rhs, stack);
+    appendln(TAB + "isub");
+    stack.addInstruction(Instructions.OP, 0);
+    appendln(TAB + "ifge LT_ELSE_" + lessthan.getLabelId());
+    appendln(TAB + "iconst_1");
+    appendln(TAB + "goto LT_NEXT_" + lessthan.getLabelId());
+    appendln(TAB + "LT_ELSE_" + lessthan.getLabelId() + ":");
+    appendln(TAB + "iconst_0");
+    appendln(TAB + "LT_NEXT_" + lessthan.getLabelId() + ":");
+    stack.addInstruction(Instructions.ICONST, 0);
   }
 
-  private void generateFalse(ASTFalse not, StackController stack) {
-    System.out.println("found not expression");
+  private void generateAnd(ASTAnd and, StackController stack) {
+    System.out.println("found and expression");
+
+    SimpleNode lhs = (SimpleNode)and.jjtGetChild(0);
+    SimpleNode rhs = (SimpleNode)and.jjtGetChild(1);
+
+    generateExpression(lhs, stack);
+    appendln(TAB + "ifne AND_" + and.getLabelId());
+    appendln(TAB + "iconst_0");
+    appendln(TAB + "goto AND_NEXT_" + and.getLabelId());
+    appendln(TAB + "AND_" + and.getLabelId() + ":");
+    stack.addInstruction(Instructions.ICONST, 0);
+    generateExpression(rhs, stack);
+    stack.addInstruction(Instructions.OP, 0);
+    appendln(TAB + "AND_NEXT_" + and.getLabelId() + ":");
+  }
+
+  private void generateTrue(ASTTrue t, StackController stack) {
+    appendln(TAB + "iconst_1");
+  }
+
+  private void generateFalse(ASTFalse f, StackController stack) {
+    appendln(TAB + "iconst_0");
   }
 
   private void generateNew(ASTNew newexpr, StackController stack) {
