@@ -110,11 +110,11 @@ public class Codegen {
 
     System.out.println("Current max stack: " + stack.getMaxStack());
 
-    // String methodName = "";
-    // if (method instanceof ASTMethod)
-    //   methodName = ((ASTMethod)method).getMethodName();
-    // else
-    //   methodName = "mainString[]";
+    String methodName = "";
+    if (method instanceof ASTMain)
+      methodName = "mainString[]";
+    else
+      methodName = ((ASTMethod)method).getMethodName();
 
     // writeStackLimit(methodName, stack);
   }
@@ -137,7 +137,7 @@ public class Codegen {
     String params = "";
 
     // For every param in methodParams, add method params to params
-    if (methodParams != null) 
+    if (methodParams != null)
       for (Node n : methodParams)
         params += convertType(((ASTMethodParam)n).getParamType()) + ";";
 
@@ -148,10 +148,10 @@ public class Codegen {
   private void generateMethodBody(SimpleNode method, StackController stack) {
     String methodName = "";
 
-    if (method instanceof ASTMethod)
-      methodName = ((ASTMethod)method).getMethodName();
-    else
+    if (method instanceof ASTMain)
       methodName = "mainString[]";
+    else
+      methodName = ((ASTMethod)method).getMethodName();
 
     appendln(TAB + ".limit stack_" + methodName);
 
@@ -159,7 +159,9 @@ public class Codegen {
     if (functionTable != null)
       appendln(TAB + ".limit locals " + functionTable.getLocals().size());
 
-    // TODO: for every statement in method, generate statement
+    // For every statement in method, generate statement
+    for (Node n : method.jjtGetChildren())
+      generateStatement((SimpleNode)n, stack);
   }
 
   private void generateMethodFooter(SimpleNode method, StackController stack) {
@@ -177,7 +179,7 @@ public class Codegen {
 
       ASTReturnStmt returnStmt = ((ASTMethod)method).getMethodReturnStmt();
       if (returnStmt != null) {
-        // TODO: generate return statement
+        generateReturnStmt(returnStmt, stack);
       }
     }
 
@@ -207,6 +209,129 @@ public class Codegen {
     appendln();
   }
 
+  private void generateStatement(SimpleNode stmt, StackController stack) {
+    if (stmt instanceof ASTVariable) {
+      generateVarDecl((ASTVariable)stmt, stack);
+    } else if (stmt instanceof ASTAssign) {
+      generateAssignment((ASTAssign)stmt, stack);
+    } else if (stmt instanceof ASTIf) {
+      generateIf((ASTIf)stmt, stack);
+    } else if (stmt instanceof ASTWhile) {
+      generateWhile((ASTWhile)stmt, stack);
+    } else if (stmt instanceof ASTMethodCall) {
+      System.out.println("found method call expression");
+    } else {
+      System.out.println("found some other statement");
+    }
+
+    return;
+  }
+
+  private void generateExpression(SimpleNode stmt, StackController stack) {
+    if (stmt instanceof ASTId) {
+      generateIdentifier((ASTId)stmt, stack);
+    } else if (stmt instanceof ASTAdd) {
+      generateAdd((ASTAdd)stmt, stack);
+    } else if (stmt instanceof ASTSub) {
+      generateSub((ASTSub)stmt, stack);
+    } else if (stmt instanceof ASTMul) {
+      generateMul((ASTMul)stmt, stack);
+    } else if (stmt instanceof ASTDiv) {
+      generateDiv((ASTDiv)stmt, stack);
+    } else if (stmt instanceof ASTLessThan) {
+      generateLessThan((ASTLessThan)stmt, stack);
+    } else if (stmt instanceof ASTFalse) {
+      generateFalse((ASTFalse)stmt, stack);
+    } else if (stmt instanceof ASTNew) {
+      generateNew((ASTNew)stmt, stack);
+    } else if (stmt instanceof ASTMethodCall) {
+      generateMethodCall((ASTMethodCall)stmt, stack);
+    } else {
+      System.out.println("found some other expression");
+    }
+
+    return;
+  }
+
+  private void generateVarDecl(ASTVariable varDecl, StackController stack) {
+    System.out.println("found a variable declaration statement");
+  }
+
+  private void generateAssignment(ASTAssign assign, StackController stack) {
+    System.out.println("found an assign statement");
+
+    ASTLhs lhs = (ASTLhs)assign.jjtGetChild(0);
+    ASTRhs rhs = (ASTRhs)assign.jjtGetChild(1);
+
+    // Generate rhs
+    generateExpression((SimpleNode)rhs.jjtGetChild(0), stack);
+
+    // Generate lhs
+    Symbol lhsSymbol = this.symbolTable.lookup(lhs.getVal());
+
+    if (lhsSymbol != null) {
+      String lhsType = lhsSymbol.getType();
+      int index = lhsSymbol.getIndex();
+
+      switch (lhsType) {
+      case "int":
+        stack.addInstruction(Instructions.ISTORE, 0);
+        appendln(TAB + "istore" + ((lhsSymbol.getIndex() <= 3) ? "_" : " ") +
+                 lhsSymbol.getIndex());
+        break;
+      case "int[]":
+        stack.addInstruction(Instructions.ASTORE, 0);
+        appendln(TAB + "astore" + ((lhsSymbol.getIndex() <= 3) ? "_" : " ") +
+                 lhsSymbol.getIndex());
+        break;
+      case "boolean":
+        stack.addInstruction(Instructions.ISTORE, 0);
+        appendln(TAB + "istore" + ((lhsSymbol.getIndex() <= 3) ? "_" : " ") +
+                 lhsSymbol.getIndex());
+        break;
+      default:
+        stack.addInstruction(Instructions.ASTORE, 0);
+        appendln(TAB + "astore" + ((lhsSymbol.getIndex() <= 3) ? "_" : " ") +
+                 lhsSymbol.getIndex());
+      }
+    }
+  }
+
+  private void generateIf(ASTIf ifStmt, StackController stack) {
+    System.out.println("found an if statement");
+
+    // Condition is first child
+    ASTIfCondition condStmt = (ASTIfCondition)ifStmt.jjtGetChild(0);
+    // Else is last child
+    ASTElse elseStmt =
+        (ASTElse)ifStmt.jjtGetChild(ifStmt.jjtGetNumChildren() - 1);
+
+    // Generate if condition
+    generateExpression(condStmt, stack);
+
+    // Generate if body
+    appendln(TAB + "ifeq ELSE_" + (ifStmt.getId()));
+    for (int i = 1; i < ifStmt.jjtGetNumChildren() - 1; i++)
+      generateStatement((SimpleNode)ifStmt.jjtGetChild(i), stack);
+    appendln(TAB + "goto NEXT_" + (ifStmt.getId()));
+
+    // Generate else
+    appendln(TAB + "ELSE_" + +ifStmt.getId() + ":");
+    if (elseStmt.jjtGetChildren() != null)
+      for (Node n : elseStmt.jjtGetChildren())
+        generateStatement((SimpleNode)n, stack);
+    appendln(TAB + "NEXT_" + ifStmt.getId() + ":");
+  }
+
+  private void generateWhile(ASTWhile whileStmt, StackController stack) {
+    System.out.println("found a while statement");
+  }
+
+  private void generateReturnStmt(ASTReturnStmt returnStmt,
+                                  StackController stack) {
+    System.out.println("found a return statement");
+  }
+
   private void generateGlobalVar(ASTVariable varDecl) {
     String name = varDecl.getVarName();
     String type = parseType(varDecl.getVarType());
@@ -215,6 +340,43 @@ public class Codegen {
       name = "'field'";
 
     appendln(".field private " + name + " " + type);
+  }
+
+  private void generateIdentifier(ASTId id, StackController stack) {
+    System.out.println("found an identifier");
+  }
+
+  private void generateAdd(ASTAdd add, StackController stack) {
+    System.out.println("found add expression");
+  }
+
+  private void generateSub(ASTSub sub, StackController stack) {
+    System.out.println("found sub expression");
+  }
+
+  private void generateMul(ASTMul mul, StackController stack) {
+    System.out.println("found mul expression");
+  }
+
+  private void generateDiv(ASTDiv mul, StackController stack) {
+    System.out.println("found div expression");
+  }
+
+  private void generateLessThan(ASTLessThan lessthan, StackController stack) {
+    System.out.println("found less than expression");
+  }
+
+  private void generateFalse(ASTFalse not, StackController stack) {
+    System.out.println("found not expression");
+  }
+
+  private void generateNew(ASTNew newexpr, StackController stack) {
+    System.out.println("found new expression");
+  }
+
+  private void generateMethodCall(ASTMethodCall methodcall,
+                                  StackController stack) {
+    System.out.println("found method call expression");
   }
 
   private String convertType(String type) {

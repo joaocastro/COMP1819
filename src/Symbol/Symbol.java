@@ -4,16 +4,19 @@ public class Symbol {
     private String name;
     private String type;
     private boolean init = false;
+    private int index;
 
     public Symbol(String name, String type) {
         this.name = name;
         this.type = type;
+        this.index = 0;
     }
 
     public Symbol(String name, String type, boolean init) {
         this.name = name;
         this.type = type;
         this.init = init;
+        this.index = 0;
     }
 
     public String getName() {
@@ -28,8 +31,16 @@ public class Symbol {
         return this.init;
     }
 
+    public int getIndex() {
+        return this.index;
+    }
+
     public void setInit(boolean val){
         this.init = val;
+    }
+
+    public void setIndex(int val){
+        this.index = val;
     }
 
     public boolean equals(String name) {

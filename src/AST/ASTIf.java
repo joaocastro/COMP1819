@@ -4,14 +4,23 @@ package AST;
 
 public
 class ASTIf extends SimpleNode {
+
+  static int counter = 0;
+  int id;
+
   public ASTIf(int id) {
     super(id);
+    this.id = counter;
+    counter++;
   }
 
   public ASTIf(Parser p, int id) {
     super(p, id);
   }
 
+  public int getId() {
+    return this.id;
+  }
 
   /** Accept the visitor. **/
   public Object jjtAccept(ParserVisitor visitor, Object data) {
