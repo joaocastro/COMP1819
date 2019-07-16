@@ -4,14 +4,23 @@ package AST;
 
 public
 class ASTWhile extends SimpleNode {
+
+  static int counter = 0;
+  int id;
+
   public ASTWhile(int id) {
     super(id);
+    this.id = counter;
+    counter++;
   }
 
   public ASTWhile(Parser p, int id) {
     super(p, id);
   }
 
+  public int getId() {
+    return this.id;
+  }
 
   /** Accept the visitor. **/
   public Object jjtAccept(ParserVisitor visitor, Object data) {

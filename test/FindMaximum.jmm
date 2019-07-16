@@ -6,11 +6,6 @@ class FindMaximum {
 		int maximum;
 		int value;
 
-		if (maximum < value) {
-			maximum = value;
-		} else {
-		}
-
 		i = 1;
 		maximum = arr[0];
 		while (i < arr.length) {

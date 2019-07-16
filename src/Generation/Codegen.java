@@ -93,6 +93,7 @@ public class Codegen {
 
     appendln(TAB + "return");
     appendln(".end method");
+    appendln();
   }
 
   private void generateMethods() {
@@ -120,8 +121,6 @@ public class Codegen {
   }
 
   private void generateMethodSignature(SimpleNode methodNode) {
-    appendln();
-
     // ASTMain
     if (methodNode instanceof ASTMain) {
       appendln(".method public static main([Ljava/lang/String;)V");
@@ -133,7 +132,6 @@ public class Codegen {
     String identifier = method.getMethodName();
     String type = method.getMethodType();
     Node[] methodParams = method.getMethodParams().jjtGetChildren();
-
     String params = "";
 
     // For every param in methodParams, add method params to params
@@ -179,7 +177,7 @@ public class Codegen {
 
       ASTReturnStmt returnStmt = ((ASTMethod)method).getMethodReturnStmt();
       if (returnStmt != null) {
-        generateExpression((SimpleNode) returnStmt.jjtGetChild(0), stack);
+        generateExpression((SimpleNode)returnStmt.jjtGetChild(0), stack);
       }
     }
 
@@ -335,6 +333,19 @@ public class Codegen {
 
   private void generateWhile(ASTWhile whileStmt, StackController stack) {
     System.out.println("found a while statement");
+
+    // Condition is first child
+    ASTWhileCondition condStmt = (ASTWhileCondition)whileStmt.jjtGetChild(0);
+    
+    appendln(TAB + "WHILE_" + whileStmt.getId() + ":");
+    generateExpression(condStmt, stack);
+    appendln(TAB + "ifeq WHILE_NEXT_" + whileStmt.getId()); 
+    
+    for(int i = 1; i < whileStmt.jjtGetNumChildren(); i++)
+      generateStatement((SimpleNode) whileStmt.jjtGetChild(i), stack); 
+    
+    appendln(TAB + "goto WHILE_" + whileStmt.getId());
+    appendln(TAB + "WHILE_NEXT_" + whileStmt.getId() + ":"); 
   }
 
   private void generateGlobalVar(ASTVariable varDecl) {
@@ -353,22 +364,26 @@ public class Codegen {
     Symbol sym = this.symbolTable.lookup(id.getVal());
 
     if (sym != null)
-      switch(sym.getType()) {
-        case "int":
+      switch (sym.getType()) {
+      case "int":
         stack.addInstruction(Instructions.ILOAD, 0);
-        appendln(TAB + "iload" + ((sym.getIndex() <= 3) ? "_" : " ") + sym.getIndex());
+        appendln(TAB + "iload" + ((sym.getIndex() <= 3) ? "_" : " ") +
+                 sym.getIndex());
         break;
-        case "int[]":
+      case "int[]":
         stack.addInstruction(Instructions.ALOAD, 0);
-        appendln(TAB + "aload" + ((sym.getIndex() <= 3) ? "_" : " ") + sym.getIndex());
+        appendln(TAB + "aload" + ((sym.getIndex() <= 3) ? "_" : " ") +
+                 sym.getIndex());
         break;
-        case "boolean":
+      case "boolean":
         stack.addInstruction(Instructions.ILOAD, 0);
-        appendln(TAB + "iload" + ((sym.getIndex() <= 3) ? "_" : " ") + sym.getIndex());
+        appendln(TAB + "iload" + ((sym.getIndex() <= 3) ? "_" : " ") +
+                 sym.getIndex());
         break;
-        default:
+      default:
         stack.addInstruction(Instructions.ALOAD, 0);
-        appendln(TAB + "aload" + ((sym.getIndex() <= 3) ? "_" : " ") + sym.getIndex());
+        appendln(TAB + "aload" + ((sym.getIndex() <= 3) ? "_" : " ") +
+                 sym.getIndex());
       }
   }
 
@@ -477,7 +492,7 @@ public class Codegen {
 
   private void generateLength(ASTLength varLength, StackController stack) {
     System.out.println("found a length expression");
-    
+
     stack.addInstruction(Instructions.ARRAYLENGTH, 0);
     appendln(TAB + "arraylength");
   }
