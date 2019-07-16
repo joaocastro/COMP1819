@@ -216,7 +216,9 @@ public class Codegen {
       generateIf((ASTIf)stmt, stack);
     } else if (stmt instanceof ASTWhile) {
       generateWhile((ASTWhile)stmt, stack);
-    } else if (stmt instanceof ASTMethodCall) {
+    } else if (stmt instanceof ASTWhile) {
+      generateArrayAssign((ASTWhile)stmt, stack);
+    }else if (stmt instanceof ASTMethodCall) {
       System.out.println("found method call expression");
     } else {
       System.out.println("found some other statement");
@@ -347,6 +349,41 @@ public class Codegen {
     appendln(TAB + "goto WHILE_" + whileStmt.getId());
     appendln(TAB + "WHILE_NEXT_" + whileStmt.getId() + ":"); 
   }
+
+  private void generateNew(ASTNew newNode, StackController stack) {
+    if (newNode.jjtGetNumChildren() > 0 && newNode.jjtGetChild(0).getId() != ParserTreeConstants.JJTINTEGER) { // new array
+      generateExpression((SimpleNode) newNode.jjtGetChild(0), stack);
+      stack.addInstruction(Instructions.NEWARRAY, 0);
+      appendln(TAB + "newarray int");
+    } else {
+      stack.addInstruction(Instructions.NEW, 0);
+      appendln(TAB + "new " + newNode.getValue());
+      stack.addInstruction(Instructions.DUP, 0);
+      appendln(TAB + "dup");
+      stack.addInstruction(Instructions.INVOKESPECIAL, 0);
+      appendln(TAB + "invokespecial " + newNode.getValue() + "/<init>()V");
+    }
+
+    if (newNode.jjtGetNumChildren() > 0 &&  newNode.jjtGetChild(0).getId() == ParserTreeConstants.JJTINTEGER) {
+      generateLiteralNR(newNode.jjtGetChild(0), stack);
+    }
+  }
+
+  private void generateLiteralNR(Node node, StackController stack) {
+    switch (node.getId()) {
+      case ParserTreeConstants.JJTARRAYINDEX:
+        generateExpression((SimpleNode) node, stack);
+        break;
+      case ParserTreeConstants.JJTMETHOD:
+        generateMethodCall((ASTMethodCall) node, stack);
+        break;
+      case ParserTreeConstants.JJTLENGTH:
+        generateLength((ASTLength) node, stack);
+        break;
+    }
+  }
+
+  
 
   private void generateGlobalVar(ASTVariable varDecl) {
     String name = varDecl.getVarName();
@@ -495,10 +532,6 @@ public class Codegen {
 
     stack.addInstruction(Instructions.ARRAYLENGTH, 0);
     appendln(TAB + "arraylength");
-  }
-
-  private void generateNew(ASTNew newexpr, StackController stack) {
-    System.out.println("found new expression");
   }
 
   private void generateMethodCall(ASTMethodCall methodcall,
