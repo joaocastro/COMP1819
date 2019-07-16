@@ -116,7 +116,7 @@ public class Codegen {
     else
       methodName = ((ASTMethod)method).getMethodName();
 
-    // writeStackLimit(methodName, stack);
+    writeStackLimit(methodName, stack);
   }
 
   private void generateMethodSignature(SimpleNode methodNode) {
@@ -179,7 +179,7 @@ public class Codegen {
 
       ASTReturnStmt returnStmt = ((ASTMethod)method).getMethodReturnStmt();
       if (returnStmt != null) {
-        generateReturnStmt(returnStmt, stack);
+        generateExpression((SimpleNode) returnStmt.jjtGetChild(0), stack);
       }
     }
 
@@ -248,6 +248,10 @@ public class Codegen {
       generateTrue((ASTTrue)stmt, stack);
     } else if (stmt instanceof ASTFalse) {
       generateFalse((ASTFalse)stmt, stack);
+    } else if (stmt instanceof ASTThis) {
+      generateThis((ASTThis)stmt, stack);
+    } else if (stmt instanceof ASTLength) {
+      generateLength((ASTLength)stmt, stack);
     } else if (stmt instanceof ASTNew) {
       generateNew((ASTNew)stmt, stack);
     } else if (stmt instanceof ASTMethodCall) {
@@ -333,11 +337,6 @@ public class Codegen {
     System.out.println("found a while statement");
   }
 
-  private void generateReturnStmt(ASTReturnStmt returnStmt,
-                                  StackController stack) {
-    System.out.println("found a return statement");
-  }
-
   private void generateGlobalVar(ASTVariable varDecl) {
     String name = varDecl.getVarName();
     String type = parseType(varDecl.getVarType());
@@ -350,6 +349,27 @@ public class Codegen {
 
   private void generateIdentifierLoad(ASTId id, StackController stack) {
     System.out.println("found an identifier");
+
+    Symbol sym = this.symbolTable.lookup(id.getVal());
+
+    if (sym != null)
+      switch(sym.getType()) {
+        case "int":
+        stack.addInstruction(Instructions.ILOAD, 0);
+        appendln(TAB + "iload" + ((sym.getIndex() <= 3) ? "_" : " ") + sym.getIndex());
+        break;
+        case "int[]":
+        stack.addInstruction(Instructions.ALOAD, 0);
+        appendln(TAB + "aload" + ((sym.getIndex() <= 3) ? "_" : " ") + sym.getIndex());
+        break;
+        case "boolean":
+        stack.addInstruction(Instructions.ILOAD, 0);
+        appendln(TAB + "iload" + ((sym.getIndex() <= 3) ? "_" : " ") + sym.getIndex());
+        break;
+        default:
+        stack.addInstruction(Instructions.ALOAD, 0);
+        appendln(TAB + "aload" + ((sym.getIndex() <= 3) ? "_" : " ") + sym.getIndex());
+      }
   }
 
   private void generateIntegerLoad(ASTInteger integer, StackController stack) {
@@ -446,6 +466,20 @@ public class Codegen {
 
   private void generateFalse(ASTFalse f, StackController stack) {
     appendln(TAB + "iconst_0");
+  }
+
+  private void generateThis(ASTThis thisVar, StackController stack) {
+    System.out.println("found a this expression");
+
+    stack.addInstruction(Instructions.ALOAD, 0);
+    appendln("aload_0");
+  }
+
+  private void generateLength(ASTLength varLength, StackController stack) {
+    System.out.println("found a length expression");
+    
+    stack.addInstruction(Instructions.ARRAYLENGTH, 0);
+    appendln(TAB + "arraylength");
   }
 
   private void generateNew(ASTNew newexpr, StackController stack) {
