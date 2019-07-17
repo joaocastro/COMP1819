@@ -1,12 +1,12 @@
 # jmm (group 65)
 
-NAME1: Guilherme Vale, NR: 201709049, GRADE: 14, CONTRIBUTION: 55%
+NAME1: Guilherme Vale, NR: 201709049, GRADE: 14, CONTRIBUTION: 90%
 
-NAME2: João Pedro Castro, NR: 201404896, GRADE: 11, CONTRIBUTION: 20%
+NAME2: João Pedro Castro, NR: 201404896, GRADE: 11, CONTRIBUTION: 10%
 
-NAME3: Miguel Pedrosa, NR: 201604343, GRADE: 11, CONTRIBUTION: 20%
+NAME3: Miguel Pedrosa, NR: 201604343, GRADE: 11, CONTRIBUTION: 0%
 
-NAME4: Guilherme Amaro, NR: 201508537, GRADE: 9, CONTRIBUTION: 5%
+NAME4: Guilherme Amaro, NR: 201508537, GRADE: 9, CONTRIBUTION: 0%
 
 ## GLOBAL Grade of the project: 13
 
@@ -51,7 +51,11 @@ Code generation naturally creates a `.j`file which can be used via Jasmin (and t
 - Global variables
 - Loading integer literals
 - Loading boolean literals
-- If blocks (incl else condition)
+- If blocks (incl else blocks)
+- While blocks
+- Conditional operators (&& and <)
+- Arithmetic operatores (+, -, *, /)
+- Assignment statements (excl array access)
 
 ## OVERVIEW: 
 

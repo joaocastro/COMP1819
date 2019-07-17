@@ -216,10 +216,8 @@ public class Codegen {
       generateIf((ASTIf)stmt, stack);
     } else if (stmt instanceof ASTWhile) {
       generateWhile((ASTWhile)stmt, stack);
-    } else if (stmt instanceof ASTWhile) {
-      generateArrayAssign((ASTWhile)stmt, stack);
-    }else if (stmt instanceof ASTMethodCall) {
-      System.out.println("found method call expression");
+    } else if (stmt instanceof ASTMethodCall) {
+      generateMethodCall((ASTMethodCall)stmt, stack);
     } else {
       System.out.println("found some other statement");
     }
@@ -351,39 +349,23 @@ public class Codegen {
   }
 
   private void generateNew(ASTNew newNode, StackController stack) {
-    if (newNode.jjtGetNumChildren() > 0 && newNode.jjtGetChild(0).getId() != ParserTreeConstants.JJTINTEGER) { // new array
-      generateExpression((SimpleNode) newNode.jjtGetChild(0), stack);
-      stack.addInstruction(Instructions.NEWARRAY, 0);
-      appendln(TAB + "newarray int");
-    } else {
-      stack.addInstruction(Instructions.NEW, 0);
-      appendln(TAB + "new " + newNode.getValue());
-      stack.addInstruction(Instructions.DUP, 0);
-      appendln(TAB + "dup");
-      stack.addInstruction(Instructions.INVOKESPECIAL, 0);
-      appendln(TAB + "invokespecial " + newNode.getValue() + "/<init>()V");
-    }
+    System.out.println("found a new statement");
 
-    if (newNode.jjtGetNumChildren() > 0 &&  newNode.jjtGetChild(0).getId() == ParserTreeConstants.JJTINTEGER) {
-      generateLiteralNR(newNode.jjtGetChild(0), stack);
-    }
+    // SimpleNode child = (SimpleNode) newNode.jjtGetChild(0);
+
+    // if (child instanceof ASTInteger) { // new array
+    //   generateExpression((SimpleNode) child.jjtGetChild(0), stack);
+    //   stack.addInstruction(Instructions.NEWARRAY, 0);
+    //   appendln(TAB + "newarray int");
+    // } else {
+    //   stack.addInstruction(Instructions.NEW, 0);
+    //   appendln(TAB + "new " + child.getVal());
+    //   stack.addInstruction(Instructions.DUP, 0);
+    //   appendln(TAB + "dup");
+    //   stack.addInstruction(Instructions.INVOKESPECIAL, 0);
+    //   appendln(TAB + "invokespecial " + child.getVal() + "/<init>()V");
+    // }
   }
-
-  private void generateLiteralNR(Node node, StackController stack) {
-    switch (node.getId()) {
-      case ParserTreeConstants.JJTARRAYINDEX:
-        generateExpression((SimpleNode) node, stack);
-        break;
-      case ParserTreeConstants.JJTMETHOD:
-        generateMethodCall((ASTMethodCall) node, stack);
-        break;
-      case ParserTreeConstants.JJTLENGTH:
-        generateLength((ASTLength) node, stack);
-        break;
-    }
-  }
-
-  
 
   private void generateGlobalVar(ASTVariable varDecl) {
     String name = varDecl.getVarName();
