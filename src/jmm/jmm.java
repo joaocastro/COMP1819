@@ -90,6 +90,9 @@ public class jmm {
                                     file_name.lastIndexOf('.'));
     root.jjtSetValue(file_name);
 
+    // Generate variable indexes
+    root_symbol_table.setIndexs(0);
+
     // Generate code
     Codegen codeGenerator = new Codegen((ASTClass) root.jjtGetChildren()[0], root_symbol_table);
     codeGenerator.generateCode();

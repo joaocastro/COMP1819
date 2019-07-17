@@ -4,4 +4,4 @@ then
  exit 1
 fi
 
-java -jar jasmin.jar -d ../jasmin $1
+java -jar jasmin.jar -d ./gen/ $1

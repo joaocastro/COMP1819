@@ -336,16 +336,16 @@ public class Codegen {
 
     // Condition is first child
     ASTWhileCondition condStmt = (ASTWhileCondition)whileStmt.jjtGetChild(0);
-    
+
     appendln(TAB + "WHILE_" + whileStmt.getId() + ":");
     generateExpression(condStmt, stack);
-    appendln(TAB + "ifeq WHILE_NEXT_" + whileStmt.getId()); 
-    
-    for(int i = 1; i < whileStmt.jjtGetNumChildren(); i++)
-      generateStatement((SimpleNode) whileStmt.jjtGetChild(i), stack); 
-    
+    appendln(TAB + "ifeq WHILE_NEXT_" + whileStmt.getId());
+
+    for (int i = 1; i < whileStmt.jjtGetNumChildren(); i++)
+      generateStatement((SimpleNode)whileStmt.jjtGetChild(i), stack);
+
     appendln(TAB + "goto WHILE_" + whileStmt.getId());
-    appendln(TAB + "WHILE_NEXT_" + whileStmt.getId() + ":"); 
+    appendln(TAB + "WHILE_NEXT_" + whileStmt.getId() + ":");
   }
 
   private void generateGlobalVar(ASTVariable varDecl) {

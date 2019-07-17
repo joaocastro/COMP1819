@@ -32,6 +32,17 @@ public class SymbolTable implements Cloneable {
 
   public LinkedHashMap<String, SymbolTable> getChildren() { return this.children; }
 
+  public void setIndexs(int count) {
+    for (Symbol s : this.params.values())
+      s.setIndex(count++);
+
+    for (Symbol s : this.locals.values())
+      s.setIndex(count++);
+
+    for (SymbolTable child : this.children.values())
+      child.setIndexs(count);
+  }
+  
   public Symbol lookup(String name) {
     for (Symbol s : this.params.values())
       if (s.equals(name))
